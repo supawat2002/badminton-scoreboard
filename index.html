@@ -621,3 +621,332 @@
                 }, { merge: true });
             } catch (e) {
                 console.error("Error saving to cloud: ", e);
+            }
+        }
+
+        window.openModal = function() {
+            document.getElementById('randomModal').style.display = 'flex';
+            renderHistoryTags();
+            updateQueueStatusUI();
+        }
+
+        window.closeModal = function() {
+            document.getElementById('randomModal').style.display = 'none';
+        }
+
+        window.openRankModal = function() {
+            document.getElementById('rankModal').style.display = 'flex';
+            renderLeaderboard();
+        }
+
+        window.closeRankModal = function() {
+            document.getElementById('rankModal').style.display = 'none';
+        }
+
+        window.showDeuceToast = function() {
+            let toast = document.getElementById('deuceToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        window.renderLeaderboard = function() {
+            let container = document.getElementById('leaderboardListContainer');
+            let sortedPlayers = [...savedPlayerHistory].sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
+
+            if (sortedPlayers.length === 0 || sortedPlayers.every(p => (playerWins[p] || 0) === 0)) {
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติการชนะ ลองเล่นและจบแมตช์ดูก่อนครับ!</div>';
+                return;
+            }
+
+            let html = '';
+            sortedPlayers.forEach((name, index) => {
+                let wins = playerWins[name] || 0;
+                let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `#${index + 1}`));
+                html += `
+                    <div class="leaderboard-item">
+                        <span class="leaderboard-rank">${rankIcon}</span>
+                        <span class="leaderboard-name">${name}</span>
+                        <span class="leaderboard-score">ชนะ ${wins} เซต</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.resetLeaderboardSecure = async function() {
+            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตสถิติทั้งหมด:");
+            if (pin === ADMIN_PIN) {
+                if (confirm('ยืนยันการล้างสถิติชัยชนะทั้งหมดหรือไม่?')) {
+                    playerWins = {};
+                    savedPlayerHistory = [];
+                    await saveToCloud();
+                    renderLeaderboard();
+                    renderHistoryTags();
+                }
+            } else if (pin !== null) {
+                alert("❌ รหัสผ่านไม่ถูกต้อง!");
+            }
+        }
+
+        window.resetMatch = function() {
+            if (confirm('ต้องการรีเซ็ตคะแนนและจำนวนเซตทั้งหมดหรือไม่?')) {
+                sets1 = 0;
+                sets2 = 0;
+                lastDeuceState = false;
+                document.getElementById('sets1').innerText = "Win Sets: 0";
+                document.getElementById('sets2').innerText = "Win Sets: 0";
+                resetScore();
+            }
+        }
+
+        window.clearAllHistory = function() {
+            if (confirm('ต้องการล้างประวัติรายชื่อทั้งหมดหรือไม่?')) {
+                savedPlayerHistory = [];
+                playerWins = {};
+                saveToCloud();
+                renderHistoryTags();
+            }
+        }
+
+        window.clearPlayerInput = function() {
+            document.getElementById('playerNames').value = '';
+            document.getElementById('playerNames').focus();
+        }
+
+        window.renderHistoryTags = function() {
+            let container = document.getElementById('historyTagsContainer');
+            if (savedPlayerHistory.length === 0) {
+                container.innerHTML = '<span style="font-size: 11px; color: #888; padding: 4px;">ยังไม่มีประวัติรายชื่อ พิมพ์แล้วระบบจะจำสถิติให้อัตโนมัติ</span>';
+                return;
+            }
+            container.innerHTML = savedPlayerHistory.map(name => {
+                let wins = playerWins[name] || 0;
+                let badge = wins >= 3 ? ' 🔥(โปร)' : '';
+                return `<div class="history-tag" onclick="appendPlayerName('${name}')">+ ${name}${badge}</div>`;
+            }).join('');
+        }
+
+        window.appendPlayerName = function(name) {
+            let textarea = document.getElementById('playerNames');
+            let currentText = textarea.value.trim();
+            if (currentText === "") {
+                textarea.value = name;
+            } else {
+                let lines = currentText.split('\n').map(p => p.trim());
+                if (!lines.includes(name)) {
+                    textarea.value = currentText + '\n' + name;
+                }
+            }
+        }
+
+        window.updateQueueStatusUI = function() {
+            let statusDiv = document.getElementById('queueStatusText');
+            if (waitingQueue.length === 0) {
+                statusDiv.innerHTML = "<b>คิวที่รออยู่:</b> ยังไม่มีรายชื่อในระบบ";
+            } else {
+                statusDiv.innerHTML = `<b>คิวรอลงสนาม (${waitingQueue.length} คน):</b> ${waitingQueue.join(', ')}`;
+            }
+        }
+
+        window.setupQueueAndPlay = async function() {
+            let rawText = document.getElementById('playerNames').value.trim();
+            let players = rawText.split('\n').map(p => p.trim()).filter(p => p.length > 0);
+            currentMatchType = parseInt(document.getElementById('matchType').value);
+
+            let requiredCount = currentMatchType === 1 ? 2 : (currentMatchType === 2 ? 4 : 6);
+            if (players.length < requiredCount) {
+                alert(`โหมดนี้ต้องใช้ผู้เล่นอย่างน้อย ${requiredCount} คนครับ!`);
+                return;
+            }
+
+            players.forEach(name => {
+                if (!savedPlayerHistory.includes(name)) {
+                    savedPlayerHistory.push(name);
+                }
+                if (!(name in playerWins)) {
+                    playerWins[name] = 0;
+                }
+            });
+
+            await saveToCloud();
+
+            let activePool = players.splice(0, requiredCount);
+            waitingQueue = players;
+
+            activePool.sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
+
+            let team1 = [];
+            let team2 = [];
+
+            if (currentMatchType === 2) {
+                team1.push(activePool[0]);
+                team2.push(activePool[1]);
+                team2.push(activePool[2]);
+                team1.push(activePool[3]);
+            } else if (currentMatchType === 3) {
+                team1.push(activePool[0], activePool[5]);
+                team2.push(activePool[1], activePool[4]);
+                team1.push(activePool[2]);
+                team2.push(activePool[3]);
+            } else {
+                team1.push(activePool[0]);
+                team2.push(activePool[1]);
+            }
+
+            activePlayersTeam1 = team1;
+            activePlayersTeam2 = team2;
+
+            updateTeamNamesUI();
+            closeModal();
+            resetMatch();
+            alert('⚖️ จัดคิวสมดุลเรียบร้อย!');
+        }
+
+        window.updateTeamNamesUI = function() {
+            if (activePlayersTeam1.length > 0) {
+                document.getElementById('name1').value = activePlayersTeam1.join(' & ');
+                document.getElementById('name2').value = activePlayersTeam2.join(' & ');
+            }
+        }
+
+        window.rotateQueue = function(loserTeam) {
+            if (waitingQueue.length === 0) {
+                alert('⚠️ ไม่มีเพื่อนรอคิวอยู่แล้วครับ!');
+                return;
+            }
+
+            let outgoingPlayers = loserTeam === 1 ? activePlayersTeam1 : activePlayersTeam2;
+            waitingQueue.push(...outgoingPlayers);
+
+            let incomingCount = currentMatchType === 1 ? 1 : (currentMatchType === 2 ? 2 : 3);
+            let newPlayers = waitingQueue.splice(0, incomingCount);
+
+            if (loserTeam === 1) {
+                activePlayersTeam1 = newPlayers;
+            } else {
+                activePlayersTeam2 = newPlayers;
+            }
+
+            updateTeamNamesUI();
+            resetScore();
+            alert('🔄 หมุนเวียนคิวเรียบร้อย!');
+        }
+
+        window.changeMaxScore = function(val) {
+            maxScore = parseInt(val);
+            if (maxScore === 7) absoluteMaxScore = 9;
+            else if (maxScore === 11) absoluteMaxScore = 15;
+            else if (maxScore === 15) absoluteMaxScore = 21;
+            else absoluteMaxScore = 30;
+
+            resetScore();
+        }
+
+        window.updateScore = function(team, value) {
+            if (team === 1) {
+                score1 += value;
+                if (score1 < 0) score1 = 0;
+                document.getElementById('score1').innerText = score1;
+            } else if (team === 2) {
+                score2 += value;
+                if (score2 < 0) score2 = 0;
+                document.getElementById('score2').innerText = score2;
+            }
+
+            checkDeuce();
+            checkWin();
+        }
+
+        window.checkDeuce = function() {
+            let deuceThreshold = maxScore - 1;
+            let isCurrentlyDeuce = (score1 >= deuceThreshold && score2 >= deuceThreshold && score1 === score2);
+
+            if (isCurrentlyDeuce && !lastDeuceState) {
+                showDeuceToast();
+            }
+            lastDeuceState = isCurrentlyDeuce;
+        }
+
+        window.checkWin = async function() {
+            let diff = Math.abs(score1 - score2);
+            let hasWon = false;
+
+            if ((score1 >= maxScore || score2 >= maxScore)) {
+                if (diff >= 2 || score1 >= absoluteMaxScore || score2 >= absoluteMaxScore) {
+                    hasWon = true;
+                }
+            }
+
+            if (hasWon) {
+                let team1Name = document.getElementById('name1').value;
+                let team2Name = document.getElementById('name2').value;
+                
+                if (score1 > score2) {
+                    sets1++;
+                    document.getElementById('sets1').innerText = "Win Sets: " + sets1;
+                    
+                    activePlayersTeam1.forEach(p => {
+                        playerWins[p] = (playerWins[p] || 0) + 1;
+                        if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
+                    });
+                    
+                    await saveToCloud();
+
+                    if (confirm(`🎉 ทีม (${team1Name}) ชนะ!\n\nให้ทีมแพ้ (${team2Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
+                        rotateQueue(2);
+                    } else {
+                        resetScore();
+                    }
+                } else {
+                    sets2++;
+                    document.getElementById('sets2').innerText = "Win Sets: " + sets2;
+                    
+                    activePlayersTeam2.forEach(p => {
+                        playerWins[p] = (playerWins[p] || 0) + 1;
+                        if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
+                    });
+                    
+                    await saveToCloud();
+
+                    if (confirm(`🎉 ทีม (${team2Name}) ชนะ!\n\nให้ทีมแพ้ (${team1Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
+                        rotateQueue(1);
+                    } else {
+                        resetScore();
+                    }
+                }
+            }
+        }
+
+        window.handleAreaClick = function(team) {
+            updateScore(team, 1);
+        }
+
+        window.resetScore = function() {
+            score1 = 0;
+            score2 = 0;
+            lastDeuceState = false;
+            document.getElementById('score1').innerText = score1;
+            document.getElementById('score2').innerText = score2;
+        }
+
+        window.changeTeamStyle = function(team, color) {
+            const container = document.getElementById(team === 1 ? 'container1' : 'container2');
+            container.style.backgroundColor = color;
+
+            const r = parseInt(color.substr(1, 2), 16);
+            const g = parseInt(color.substr(3, 2), 16);
+            const b = parseInt(color.substr(5, 2), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+            if (brightness < 128) {
+                container.style.color = '#ffffff';
+            } else {
+                container.style.color = '#111111';
+            }
+        }
+    </script>
+
+</body>
+</html>
