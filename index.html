@@ -565,7 +565,24 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK (CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCydHu6xNL4BMJchkuOa7U1wbAoqx1obBA",
+            authDomain: "badminton-scoreboard-9a3e9.firebaseapp.com",
+            projectId: "badminton-scoreboard-9a3e9",
+            storageBucket: "badminton-scoreboard-9a3e9.firebasestorage.app",
+            messagingSenderId: "987628275399",
+            appId: "1:987628275399:web:30a1a0fd83a2b0d65a60e2",
+            measurementId: "G-GY7LTREQEH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         let score1 = 0;
         let score2 = 0;
         let sets1 = 0;
@@ -578,31 +595,57 @@
         let activePlayersTeam2 = [];
         let currentMatchType = 2;
 
-        let savedPlayerHistory = JSON.parse(localStorage.getItem('badminton_player_history')) || [];
-        let playerWins = JSON.parse(localStorage.getItem('badminton_player_wins')) || {};
-
+        let savedPlayerHistory = [];
+        let playerWins = {};
         let lastDeuceState = false;
 
-        function openModal() {
+        // ดึงข้อมูล Real-time จาก Firebase Firestore ทันทีที่เปิดเว็บ
+        const rankDocRef = doc(db, "badminton_data", "leaderboard_room");
+        
+        onSnapshot(rankDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                let data = docSnap.data();
+                playerWins = data.wins || {};
+                savedPlayerHistory = data.history || [];
+            } else {
+                // ถ้ายังไม่มีข้อมูล สร้างเอกสารเริ่มต้น
+                setDoc(rankDocRef, { wins: {}, history: [] });
+            }
+            renderHistoryTags();
+            renderLeaderboard();
+        });
+
+        async function saveToCloud() {
+            try {
+                await setDoc(rankDocRef, {
+                    wins: playerWins,
+                    history: savedPlayerHistory
+                }, { merge: true });
+            } catch (e) {
+                console.error("Error saving to cloud: ", e);
+            }
+        }
+
+        window.openModal = function() {
             document.getElementById('randomModal').style.display = 'flex';
             renderHistoryTags();
             updateQueueStatusUI();
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             document.getElementById('randomModal').style.display = 'none';
         }
 
-        function openRankModal() {
+        window.openRankModal = function() {
             document.getElementById('rankModal').style.display = 'flex';
             renderLeaderboard();
         }
 
-        function closeRankModal() {
+        window.closeRankModal = function() {
             document.getElementById('rankModal').style.display = 'none';
         }
 
-        function showDeuceToast() {
+        window.showDeuceToast = function() {
             let toast = document.getElementById('deuceToast');
             toast.classList.add('show');
             setTimeout(() => {
@@ -610,7 +653,7 @@
             }, 2000);
         }
 
-        function renderLeaderboard() {
+        window.renderLeaderboard = function() {
             let container = document.getElementById('leaderboardListContainer');
             let sortedPlayers = [...savedPlayerHistory].sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
 
@@ -634,31 +677,31 @@
             container.innerHTML = html;
         }
 
-        function resetLeaderboard() {
+        window.resetLeaderboard = async function() {
             if (confirm('ต้องการล้างสถิติชัยชนะทั้งหมดของทุกคนหรือไม่?')) {
                 playerWins = {};
-                localStorage.setItem('badminton_player_wins', JSON.stringify(playerWins));
+                savedPlayerHistory = [];
+                await saveToCloud();
                 renderLeaderboard();
                 renderHistoryTags();
             }
         }
 
-        function clearPlayerInput() {
+        window.clearPlayerInput = function() {
             document.getElementById('playerNames').value = '';
             document.getElementById('playerNames').focus();
         }
 
-        function clearAllHistory() {
+        window.clearAllHistory = async function() {
             if (confirm('ต้องการล้างประวัติรายชื่อและสถิติทั้งหมดหรือไม่?')) {
                 savedPlayerHistory = [];
                 playerWins = {};
-                localStorage.removeItem('badminton_player_history');
-                localStorage.removeItem('badminton_player_wins');
+                await saveToCloud();
                 renderHistoryTags();
             }
         }
 
-        function renderHistoryTags() {
+        window.renderHistoryTags = function() {
             let container = document.getElementById('historyTagsContainer');
             if (savedPlayerHistory.length === 0) {
                 container.innerHTML = '<span style="font-size: 11px; color: #888; padding: 4px;">ยังไม่มีประวัติรายชื่อ พิมพ์แล้วระบบจะจำสถิติให้อัตโนมัติ</span>';
@@ -671,7 +714,7 @@
             }).join('');
         }
 
-        function appendPlayerName(name) {
+        window.appendPlayerName = function(name) {
             let textarea = document.getElementById('playerNames');
             let currentText = textarea.value.trim();
             if (currentText === "") {
@@ -684,7 +727,7 @@
             }
         }
 
-        function updateQueueStatusUI() {
+        window.updateQueueStatusUI = function() {
             let statusDiv = document.getElementById('queueStatusText');
             if (waitingQueue.length === 0) {
                 statusDiv.innerHTML = "<b>คิวที่รออยู่:</b> ยังไม่มีรายชื่อในระบบ";
@@ -693,7 +736,7 @@
             }
         }
 
-        function setupQueueAndPlay() {
+        window.setupQueueAndPlay = async function() {
             let rawText = document.getElementById('playerNames').value.trim();
             let players = rawText.split('\n').map(p => p.trim()).filter(p => p.length > 0);
             currentMatchType = parseInt(document.getElementById('matchType').value);
@@ -712,8 +755,8 @@
                     playerWins[name] = 0;
                 }
             });
-            localStorage.setItem('badminton_player_history', JSON.stringify(savedPlayerHistory));
-            localStorage.setItem('badminton_player_wins', JSON.stringify(playerWins));
+
+            await saveToCloud();
 
             let totalActiveNeeded = requiredCount;
             let activePool = players.splice(0, totalActiveNeeded);
@@ -748,14 +791,14 @@
             alert('⚖️ จัดคิวสมดุล (เกลี่ยมือโปร/มือใหม่) เรียบร้อย!');
         }
 
-        function updateTeamNamesUI() {
+        window.updateTeamNamesUI = function() {
             if (activePlayersTeam1.length > 0) {
                 document.getElementById('name1').value = activePlayersTeam1.join(' & ');
                 document.getElementById('name2').value = activePlayersTeam2.join(' & ');
             }
         }
 
-        function rotateQueue(loserTeam) {
+        window.rotateQueue = function(loserTeam) {
             if (waitingQueue.length === 0) {
                 alert('⚠️ ไม่มีเพื่อนรอคิวอยู่แล้วครับ!');
                 return;
@@ -778,7 +821,7 @@
             alert('🔄 หมุนเวียนคิวเรียบร้อย!');
         }
 
-        function changeMaxScore(val) {
+        window.changeMaxScore = function(val) {
             maxScore = parseInt(val);
             if (maxScore === 7) absoluteMaxScore = 9;
             else if (maxScore === 11) absoluteMaxScore = 15;
@@ -788,7 +831,7 @@
             resetScore();
         }
 
-        function updateScore(team, value) {
+        window.updateScore = function(team, value) {
             if (team === 1) {
                 score1 += value;
                 if (score1 < 0) score1 = 0;
@@ -803,7 +846,7 @@
             checkWin();
         }
 
-        function checkDeuce() {
+        window.checkDeuce = function() {
             let deuceThreshold = maxScore - 1;
             let isCurrentlyDeuce = (score1 >= deuceThreshold && score2 >= deuceThreshold && score1 === score2);
 
@@ -813,7 +856,7 @@
             lastDeuceState = isCurrentlyDeuce;
         }
 
-        function checkWin() {
+        window.checkWin = async function() {
             let diff = Math.abs(score1 - score2);
             let hasWon = false;
 
@@ -833,8 +876,10 @@
                     
                     activePlayersTeam1.forEach(p => {
                         playerWins[p] = (playerWins[p] || 0) + 1;
+                        if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
                     });
-                    localStorage.setItem('badminton_player_wins', JSON.stringify(playerWins));
+                    
+                    await saveToCloud();
 
                     if (confirm(`🎉 ทีม (${team1Name}) ชนะ!\n\nให้ทีมแพ้ (${team2Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
                         rotateQueue(2);
@@ -847,8 +892,10 @@
                     
                     activePlayersTeam2.forEach(p => {
                         playerWins[p] = (playerWins[p] || 0) + 1;
+                        if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
                     });
-                    localStorage.setItem('badminton_player_wins', JSON.stringify(playerWins));
+                    
+                    await saveToCloud();
 
                     if (confirm(`🎉 ทีม (${team2Name}) ชนะ!\n\nให้ทีมแพ้ (${team1Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
                         rotateQueue(1);
@@ -859,11 +906,11 @@
             }
         }
 
-        function handleAreaClick(team) {
+        window.handleAreaClick = function(team) {
             updateScore(team, 1);
         }
 
-        function resetScore() {
+        window.resetScore = function() {
             score1 = 0;
             score2 = 0;
             lastDeuceState = false;
@@ -871,7 +918,7 @@
             document.getElementById('score2').innerText = score2;
         }
 
-        function resetMatch() {
+        window.resetMatch = function() {
             if (confirm('ต้องการรีเซ็ตคะแนนและจำนวนเซตทั้งหมดหรือไม่?')) {
                 sets1 = 0;
                 sets2 = 0;
@@ -882,7 +929,7 @@
             }
         }
 
-        function changeTeamStyle(team, color) {
+        window.changeTeamStyle = function(team, color) {
             const container = document.getElementById(team === 1 ? 'container1' : 'container2');
             container.style.backgroundColor = color;
 
