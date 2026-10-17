@@ -48,13 +48,8 @@
             transition: transform 0.1s, background 0.2s;
         }
 
-        .floating-btn:hover {
-            background: rgba(255, 255, 255, 0.85);
-        }
-
-        .floating-btn:active {
-            transform: scale(0.92);
-        }
+        .floating-btn:hover { background: rgba(255, 255, 255, 0.85); }
+        .floating-btn:active { transform: scale(0.92); }
 
         .deuce-toast {
             position: fixed;
@@ -75,11 +70,7 @@
             z-index: 3000;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-
-        .deuce-toast.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
+        .deuce-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         .team-container {
             flex: 1;
@@ -94,16 +85,8 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        .team-1 {
-            background-color: #e3f2fd;
-            color: #222;
-            border-bottom: 2px solid rgba(255,255,255,0.5);
-        }
-
-        .team-2 {
-            background-color: #fbe9e7;
-            color: #222;
-        }
+        .team-1 { background-color: #e3f2fd; color: #222; border-bottom: 2px solid rgba(255,255,255,0.5); }
+        .team-2 { background-color: #fbe9e7; color: #222; }
 
         .team-title-input {
             font-size: 16px;
@@ -119,11 +102,6 @@
             padding: 4px 10px;
             border-radius: 6px;
             cursor: text;
-            transition: background 0.2s;
-        }
-
-        .team-title-input:hover, .team-title-input:focus {
-            background: rgba(128, 128, 128, 0.2);
         }
 
         .set-badge {
@@ -145,217 +123,137 @@
             letter-spacing: -2px;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 15px;
-        }
-
+        .btn-group { display: flex; gap: 15px; }
         .score-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            font-size: 22px; font-weight: bold; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: transform 0.1s;
         }
-
-        .score-btn:active {
-            transform: scale(0.92);
-        }
-
-        .minus-btn {
-            background-color: rgba(0, 0, 0, 0.08);
-            color: inherit;
-            font-size: 26px;
-        }
+        .minus-btn { background-color: rgba(0, 0, 0, 0.08); color: inherit; font-size: 26px; }
 
         .control-dock {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            padding: 10px 18px;
-            border-radius: 35px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            z-index: 999;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(15px);
+            display: flex; gap: 8px; align-items: center; padding: 10px 18px;
+            border-radius: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            border: 1px solid rgba(255, 255, 255, 0.8); z-index: 999;
         }
 
         .dock-btn {
-            background: rgba(0,0,0,0.06);
-            border: none;
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background 0.2s, transform 0.1s;
+            background: rgba(0,0,0,0.06); border: none; padding: 7px 14px;
+            border-radius: 20px; font-size: 12px; font-weight: 600; color: #333; cursor: pointer;
         }
+        .reset-dock-btn { background-color: #ff3b30; color: white; }
+        .queue-dock-btn { background-color: #34c759; color: white; }
 
-        .dock-btn:hover {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .dock-btn:active {
-            transform: scale(0.95);
-        }
-
-        .reset-dock-btn {
-            background-color: #ff3b30;
-            color: white;
-        }
-
-        .queue-dock-btn {
-            background-color: #34c759;
-            color: white;
-        }
-
-        .color-picker-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .color-input {
-            appearance: none;
-            -webkit-appearance: none;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            background: transparent;
-        }
-
-        .color-input::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-
-        .color-input::-webkit-color-swatch {
-            border: 2px solid white;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .settings-select {
-            background: rgba(0, 0, 0, 0.06);
-            border: none;
-            padding: 7px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            outline: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .settings-select:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
+        .color-picker-wrapper { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #444; }
+        .color-input { appearance: none; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; background: transparent; }
+        .settings-select { background: rgba(0,0,0,0.06); border: none; padding: 7px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #333; outline: none; cursor: pointer; }
 
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
         }
 
         .modal-card {
-            background: white;
-            padding: 25px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 440px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
+            background: white; padding: 25px; border-radius: 24px;
+            width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            text-align: center; max-height: 90vh; overflow-y: auto;
         }
 
-        .modal-card h2 {
-            margin-bottom: 12px;
-            font-size: 18px;
-            color: #333;
-        }
-
+        .modal-card h2 { margin-bottom: 12px; font-size: 18px; color: #333; }
         .modal-card select, .modal-card textarea {
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #ddd; font-size: 14px; background: #fafafa;
+        }
+        .modal-card textarea { height: 80px; resize: none; }
+
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .label-row span { font-size: 12px; font-weight: 600; color: #666; }
+        .clear-text-btn { background: none; border: none; color: #ff3b30; font-size: 12px; font-weight: 600; cursor: pointer; padding: 2px 6px; }
+
+        /* --- สไตล์หน้าต่างทำเนียบแชมป์ (ปรับแต่งรูปให้พอดีกรอบ และเอาป้ายชื่อไว้บนหัวเป๊ะๆ) --- */
+        .cloud-modal-card {
+            background: #111318 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .cloud-modal-card h2 {
+            color: #ffd700 !important;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
+
+        .image-podium-wrapper {
+            position: relative;
             width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            outline: none;
-            background: #fafafa;
-        }
-
-        .modal-card textarea {
-            height: 80px;
-            resize: none;
-        }
-
-        .label-row {
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 15px 0;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 4px;
         }
 
-        .label-row span {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
+        .image-podium-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* ปรับขนาดรูปให้เข้ากับกรอบพอดี ไม่โดนตัดขอบ */
         }
 
-        .clear-text-btn {
-            background: none;
-            border: none;
-            color: #ff3b30;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 6px;
-            transition: background 0.2s;
+        .overlay-card {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            padding: 4px 8px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            z-index: 2;
+            max-width: 100px;
         }
 
-        .clear-text-btn:hover {
-            background: rgba(255, 59, 48, 0.1);
+        .overlay-name {
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
+
+        .overlay-sets {
+            font-size: 9px;
+            font-weight: 700;
+            color: #38ef7d;
+        }
+
+        /* --- พิกัดป้ายชื่อขึ้นไปอยู่บนหัวตัวละครแต่ละคน --- */
+        .overlay-rank-1 { top: 2%; left: 50%; transform: translateX(-50%); border-color: #ffd700; }
+        .overlay-rank-1 .overlay-name { color: #ffd700; }
+
+        .overlay-rank-2 { top: 12%; left: 24%; transform: translateX(-50%); border-color: #c0c0c0; }
+        .overlay-rank-2 .overlay-name { color: #c0c0c0; }
+
+        .overlay-rank-3 { top: 15%; left: 76%; transform: translateX(-50%); border-color: #cd7f32; }
+        .overlay-rank-3 .overlay-name { color: #cd7f32; }
 
         .leaderboard-list {
-            background: #f9f9fb;
-            border-radius: 12px;
-            padding: 10px;
+            background: #1a1d24;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 8px;
             margin-bottom: 15px;
-            max-height: 200px;
+            max-height: 140px;
             overflow-y: auto;
             text-align: left;
         }
@@ -364,107 +262,34 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
-            border-bottom: 1px solid #eee;
+            padding: 7px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 13px;
         }
 
-        .leaderboard-item:last-child {
-            border-bottom: none;
-        }
-
-        .leaderboard-rank {
-            font-weight: 700;
-            color: #ff9500;
-            width: 30px;
-        }
-
-        .leaderboard-name {
-            flex: 1;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .leaderboard-score {
-            font-weight: 700;
-            color: #007aff;
-            background: rgba(0,122,255,0.1);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-        }
+        .leaderboard-item:last-child { border-bottom: none; }
+        .leaderboard-rank { font-weight: 700; color: #aaa; width: 30px; }
+        .leaderboard-name { flex: 1; font-weight: 600; color: #fff; }
+        .leaderboard-score { font-weight: 700; color: #38ef7d; font-size: 12px; }
 
         .history-tags-container {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            max-height: 70px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-            padding: 4px;
-            background: #f4f4f6;
-            border-radius: 10px;
-            text-align: left;
+            display: flex; gap: 6px; flex-wrap: wrap; max-height: 70px;
+            overflow-y: auto; margin-bottom: 12px; padding: 4px; background: #f4f4f6; border-radius: 10px; text-align: left;
         }
-
         .history-tag {
-            background: #ffffff;
-            border: 1px solid #ddd;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+            background: #ffffff; border: 1px solid #ddd; padding: 4px 10px;
+            border-radius: 15px; font-size: 11px; font-weight: 600; color: #333; cursor: pointer;
         }
 
-        .history-tag:hover {
-            background: #007aff;
-            color: white;
-            border-color: #007aff;
-        }
-
-        .queue-status {
-            background: #f0f0f5;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-bottom: 12px;
-            text-align: left;
-            color: #444;
-        }
-
-        .modal-btn-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-confirm {
-            background: #007aff;
-            color: white;
-        }
-
-        .btn-cancel {
-            background: #e5e5ea;
-            color: #333;
-        }
+        .queue-status { background: #f0f0f5; padding: 10px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; text-align: left; color: #444; }
+        .modal-btn-group { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .btn-confirm { background: #007aff; color: white; }
+        .btn-cancel { background: #2a2f3d; color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- ปุ่มเปิดตารางแรงค์ (📊 ก๊วนเรา | 🏆 ทำเนียบแชมป์โลก Cloud) -->
     <div class="top-right-btns">
         <div class="floating-btn" onclick="openLocalRankModal()" title="แรงค์ก๊วนเราเอง">📊</div>
         <div class="floating-btn" onclick="openCloudRankModal()" title="ทำเนียบแชมป์โลก (Cloud)">🏆</div>
@@ -502,15 +327,11 @@
                 <option value="21" selected>🎯 21 แต้ม</option>
             </select>
         </div>
-
         <div class="color-picker-wrapper">
-            <span>ทีม1:</span>
-            <input type="color" class="color-input" value="#e3f2fd" oninput="changeTeamStyle(1, this.value)">
+            <span>ทีม1:</span><input type="color" class="color-input" value="#e3f2fd" oninput="changeTeamStyle(1, this.value)">
         </div>
-
         <div class="color-picker-wrapper">
-            <span>ทีม2:</span>
-            <input type="color" class="color-input" value="#fbe9e7" oninput="changeTeamStyle(2, this.value)">
+            <span>ทีม2:</span><input type="color" class="color-input" value="#fbe9e7" oninput="changeTeamStyle(2, this.value)">
         </div>
     </div>
 
@@ -522,21 +343,16 @@
                 <option value="2" selected>คู่ (2 vs 2) - ใช้ 4 คนขึ้นไป</option>
                 <option value="3">ทีมละ 3 คน (3 vs 3) - ใช้ 6 คนขึ้นไป</option>
             </select>
-
             <div class="label-row">
                 <span>ประวัติรายชื่อเพื่อน (คลิกเพื่อเพิ่ม):</span>
                 <button class="clear-text-btn" onclick="clearAllHistory()">🗑️ ล้างประวัติ</button>
             </div>
-
             <div class="history-tags-container" id="historyTagsContainer"></div>
-
             <div class="label-row" style="margin-top: 8px;">
                 <span>พิมพ์รายชื่อเพื่อน:</span>
                 <button class="clear-text-btn" onclick="clearPlayerInput()">🗑️ ล้างช่องพิมพ์</button>
             </div>
-
             <textarea id="playerNames" placeholder="พิมพ์รายชื่อเพื่อนทั้งหมด บรรทัดละ 1 คน"></textarea>
-            
             <div class="queue-status" id="queueStatusText">คิวที่รออยู่: ยังไม่มีข้อมูล</div>
             <div class="modal-btn-group">
                 <button class="modal-btn btn-cancel" onclick="closeModal()">ปิด</button>
@@ -545,7 +361,6 @@
         </div>
     </div>
 
-    <!-- หน้าต่างแสดงแรงค์เฉพาะก๊วนเรา (เปิดผ่านปุ่ม 📊) -->
     <div class="modal-overlay" id="localRankModal" onclick="closeLocalRankModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2>📊 ตารางแรงค์ (เฉพาะก๊วนเรา)</h2>
@@ -557,14 +372,18 @@
         </div>
     </div>
 
-    <!-- หน้าต่างทำเนียบแชมป์โลก Cloud (เปิดผ่านปุ่ม 🏆) -->
+    <!-- หน้าต่างทำเนียบแชมป์โลก -->
     <div class="modal-overlay" id="cloudRankModal" onclick="closeCloudRankModal()">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <h2>🏆 ทำเนียบแชมป์โลก (Cloud Leaderboard)</h2>
-            <p style="font-size: 11px; color: #666; margin-bottom: 10px;">สถิติรวมออนไลน์จากระบบกลาง</p>
-            <div class="leaderboard-list" id="cloudLeaderboardListContainer">
-                <div style="text-align: center; color: #888; padding: 15px; font-size: 13px;">กำลังเชื่อมต่อคลาวด์...</div>
+        <div class="modal-card cloud-modal-card" onclick="event.stopPropagation()">
+            <h2>🏆 ทำเนียบแชมป์โลก (Podium)</h2>
+            <p style="font-size: 11px; color: #888; margin-bottom: 5px;">สถิติสูงสุดจากระบบกลาง</p>
+            
+            <div class="image-podium-wrapper" id="imagePodiumContainer">
+                <!-- โหลดรูปโพเดียมจาก Discord -->
             </div>
+
+            <div class="leaderboard-list" id="cloudLeaderboardListContainer"></div>
+
             <div class="modal-btn-group">
                 <button class="modal-btn btn-cancel" onclick="closeCloudRankModal()">ปิด</button>
                 <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetCloudLeaderboardSecure()">รีเซ็ตคลาวด์กลาง</button>
@@ -572,20 +391,9 @@
         </div>
     </div>
 
-    <!-- ระบบหลักประจำก๊วน (Local Storage) -->
     <script>
-        let score1 = 0;
-        let score2 = 0;
-        let sets1 = 0;
-        let sets2 = 0;
-        let maxScore = 21;
-        let absoluteMaxScore = 30;
-
-        let waitingQueue = [];
-        let activePlayersTeam1 = [];
-        let activePlayersTeam2 = [];
-        let currentMatchType = 2;
-
+        let score1 = 0, score2 = 0, sets1 = 0, sets2 = 0, maxScore = 21, absoluteMaxScore = 30;
+        let waitingQueue = [], activePlayersTeam1 = [], activePlayersTeam2 = [], currentMatchType = 2;
         let savedPlayerHistory = JSON.parse(localStorage.getItem('badminton_history') || '[]');
         let playerWins = JSON.parse(localStorage.getItem('badminton_wins') || '{}');
         let lastDeuceState = false;
@@ -596,32 +404,15 @@
             localStorage.setItem('badminton_wins', JSON.stringify(playerWins));
         }
 
-        function openModal() {
-            document.getElementById('randomModal').style.display = 'flex';
-            renderHistoryTags();
-            updateQueueStatusUI();
-        }
-
-        function closeModal() {
-            document.getElementById('randomModal').style.display = 'none';
-        }
-
-        function openLocalRankModal() {
-            document.getElementById('localRankModal').style.display = 'flex';
-            renderLocalLeaderboard();
-        }
-
-        function closeLocalRankModal() {
-            document.getElementById('localRankModal').style.display = 'none';
-        }
-
+        function openModal() { document.getElementById('randomModal').style.display = 'flex'; renderHistoryTags(); updateQueueStatusUI(); }
+        function closeModal() { document.getElementById('randomModal').style.display = 'none'; }
+        function openLocalRankModal() { document.getElementById('localRankModal').style.display = 'flex'; renderLocalLeaderboard(); }
+        function closeLocalRankModal() { document.getElementById('localRankModal').style.display = 'none'; }
+        
         function openCloudRankModal() {
             document.getElementById('cloudRankModal').style.display = 'flex';
-            if (typeof fetchCloudLeaderboard === 'function') {
-                fetchCloudLeaderboard();
-            }
+            if (typeof fetchCloudLeaderboard === 'function') fetchCloudLeaderboard();
         }
-
         function closeCloudRankModal() {
             document.getElementById('cloudRankModal').style.display = 'none';
         }
@@ -632,48 +423,28 @@
             setTimeout(() => { toast.classList.remove('show'); }, 2000);
         }
 
-        function clearPlayerInput() {
-            document.getElementById('playerNames').value = '';
-            document.getElementById('playerNames').focus();
-        }
-
+        function clearPlayerInput() { document.getElementById('playerNames').value = ''; document.getElementById('playerNames').focus(); }
         function appendPlayerName(name) {
             let textarea = document.getElementById('playerNames');
             let currentText = textarea.value.trim();
-            if (currentText === "") {
-                textarea.value = name;
-            } else {
+            if (currentText === "") textarea.value = name;
+            else {
                 let lines = currentText.split('\n').map(p => p.trim());
-                if (!lines.includes(name)) {
-                    textarea.value = currentText + '\n' + name;
-                }
+                if (!lines.includes(name)) textarea.value = currentText + '\n' + name;
             }
         }
 
-        function handleAreaClick(team) {
-            updateScore(team, 1);
-        }
-
+        function handleAreaClick(team) { updateScore(team, 1); }
         function updateScore(team, value) {
-            if (team === 1) {
-                score1 += value;
-                if (score1 < 0) score1 = 0;
-                document.getElementById('score1').innerText = score1;
-            } else if (team === 2) {
-                score2 += value;
-                if (score2 < 0) score2 = 0;
-                document.getElementById('score2').innerText = score2;
-            }
-            checkDeuce();
-            checkWin();
+            if (team === 1) { score1 += value; if (score1 < 0) score1 = 0; document.getElementById('score1').innerText = score1; }
+            else if (team === 2) { score2 += value; if (score2 < 0) score2 = 0; document.getElementById('score2').innerText = score2; }
+            checkDeuce(); checkWin();
         }
 
         function checkDeuce() {
             let deuceThreshold = maxScore - 1;
             let isCurrentlyDeuce = (score1 >= deuceThreshold && score2 >= deuceThreshold && score1 === score2);
-            if (isCurrentlyDeuce && !lastDeuceState) {
-                showDeuceToast();
-            }
+            if (isCurrentlyDeuce && !lastDeuceState) showDeuceToast();
             lastDeuceState = isCurrentlyDeuce;
         }
 
@@ -686,18 +457,10 @@
             resetScore();
         }
 
-        function resetScore() {
-            score1 = 0;
-            score2 = 0;
-            lastDeuceState = false;
-            document.getElementById('score1').innerText = score1;
-            document.getElementById('score2').innerText = score2;
-        }
-
+        function resetScore() { score1 = 0; score2 = 0; lastDeuceState = false; document.getElementById('score1').innerText = score1; document.getElementById('score2').innerText = score2; }
         function resetMatch() {
             if (confirm('ต้องการรีเซ็ตคะแนนและจำนวนเซตทั้งหมดหรือไม่?')) {
-                sets1 = 0;
-                sets2 = 0;
+                sets1 = 0; sets2 = 0;
                 document.getElementById('sets1').innerText = "Win Sets: 0";
                 document.getElementById('sets2').innerText = "Win Sets: 0";
                 resetScore();
@@ -712,35 +475,20 @@
         }
 
         function rotateQueue(loserTeam) {
-            if (waitingQueue.length === 0) {
-                alert('⚠️ ไม่มีเพื่อนรอคิวอยู่แล้วครับ! กรุณาเพิ่มรายชื่อเพิ่มในเมนูจัดคิว');
-                return;
-            }
+            if (waitingQueue.length === 0) { alert('⚠️ ไม่มีเพื่อนรอคิวอยู่แล้วครับ!'); return; }
             let outgoingPlayers = loserTeam === 1 ? activePlayersTeam1 : activePlayersTeam2;
             waitingQueue.push(...outgoingPlayers);
-
             let incomingCount = currentMatchType === 1 ? 1 : (currentMatchType === 2 ? 2 : 3);
             let newPlayers = waitingQueue.splice(0, incomingCount);
-
-            if (loserTeam === 1) {
-                activePlayersTeam1 = newPlayers;
-            } else {
-                activePlayersTeam2 = newPlayers;
-            }
-
-            updateTeamNamesUI();
-            resetScore();
-            alert('🔄 หมุนเวียนคิวเรียบร้อย!');
+            if (loserTeam === 1) activePlayersTeam1 = newPlayers; else activePlayersTeam2 = newPlayers;
+            updateTeamNamesUI(); resetScore(); alert('🔄 หมุนเวียนคิวเรียบร้อย!');
         }
 
         function changeTeamStyle(team, color) {
             const container = document.getElementById(team === 1 ? 'container1' : 'container2');
             container.style.backgroundColor = color;
-            const r = parseInt(color.substr(1, 2), 16);
-            const g = parseInt(color.substr(3, 2), 16);
-            const b = parseInt(color.substr(5, 2), 16);
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            container.style.color = brightness < 128 ? '#ffffff' : '#111111';
+            const r = parseInt(color.substr(1, 2), 16), g = parseInt(color.substr(3, 2), 16), b = parseInt(color.substr(5, 2), 16);
+            container.style.color = ((r * 299 + g * 587 + b * 114) / 1000) < 128 ? '#ffffff' : '#111111';
         }
 
         function shuffleArray(array) {
@@ -755,100 +503,50 @@
             let rawText = document.getElementById('playerNames').value.trim();
             let players = rawText.split('\n').map(p => p.trim()).filter(p => p.length > 0);
             currentMatchType = parseInt(document.getElementById('matchType').value);
-
             let requiredCount = currentMatchType === 1 ? 2 : (currentMatchType === 2 ? 4 : 6);
-            if (players.length < requiredCount) {
-                alert(`โหมดนี้ต้องใช้ผู้เล่นอย่างน้อย ${requiredCount} คนครับ! (ปัจจุบันมี ${players.length} คน)`);
-                return;
-            }
+            if (players.length < requiredCount) { alert(`โหมดนี้ต้องใช้ผู้เล่นอย่างน้อย ${requiredCount} คนครับ!`); return; }
 
             players.forEach(name => {
                 if (!savedPlayerHistory.includes(name)) savedPlayerHistory.push(name);
                 if (!(name in playerWins)) playerWins[name] = 0;
             });
-
             saveToLocal();
 
             let shuffledPlayers = shuffleArray([...players]);
             let activePool = shuffledPlayers.splice(0, requiredCount);
             waitingQueue = shuffledPlayers;
 
-            let team1 = [];
-            let team2 = [];
-
             if (currentMatchType === 2) {
-                team1.push(activePool[0], activePool[1]);
-                team2.push(activePool[2], activePool[3]);
+                activePlayersTeam1 = [activePool[0], activePool[1]];
+                activePlayersTeam2 = [activePool[2], activePool[3]];
             } else if (currentMatchType === 3) {
-                team1.push(activePool[0], activePool[1], activePool[2]);
-                team2.push(activePool[3], activePool[4], activePool[5]);
+                activePlayersTeam1 = [activePool[0], activePool[1], activePool[2]];
+                activePlayersTeam2 = [activePool[3], activePool[4], activePool[5]];
             } else {
-                team1.push(activePool[0]);
-                team2.push(activePool[1]);
+                activePlayersTeam1 = [activePool[0]];
+                activePlayersTeam2 = [activePool[1]];
             }
 
-            activePlayersTeam1 = team1;
-            activePlayersTeam2 = team2;
-
-            updateTeamNamesUI();
-            closeModal();
-            resetMatch();
-            updateQueueStatusUI();
-            alert('🎲 สุ่มจับคู่รายชื่อลงสนามเรียบร้อย!');
+            updateTeamNamesUI(); closeModal(); resetMatch(); updateQueueStatusUI(); alert('🎲 สุ่มจับคู่รายชื่อลงสนามเรียบร้อย!');
         }
 
         function checkWin() {
             let diff = Math.abs(score1 - score2);
-            let hasWon = false;
-
-            if ((score1 >= maxScore || score2 >= maxScore)) {
-                if (diff >= 2 || score1 >= absoluteMaxScore || score2 >= absoluteMaxScore) {
-                    hasWon = true;
-                }
-            }
+            let hasWon = (score1 >= maxScore || score2 >= maxScore) && (diff >= 2 || score1 >= absoluteMaxScore || score2 >= absoluteMaxScore);
 
             if (hasWon) {
                 let team1Name = document.getElementById('name1').value;
                 let team2Name = document.getElementById('name2').value;
-                
                 if (score1 > score2) {
-                    sets1++;
-                    document.getElementById('sets1').innerText = "Win Sets: " + sets1;
-                    activePlayersTeam1.forEach(p => {
-                        playerWins[p] = (playerWins[p] || 0) + 1;
-                        if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
-                    });
-                    saveToLocal();
-                    
-                    // ซิงค์คะแนนขึ้น Cloud อัตโนมัติทันที
-                    if (typeof autoSyncToCloud === 'function') {
-                        autoSyncToCloud();
-                    }
-
-                    if (confirm(`🎉 ทีม (${team1Name}) ชนะ!\n\nให้ทีมแพ้ (${team2Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
-                        rotateQueue(2);
-                    } else {
-                        resetScore();
-                    }
+                    sets1++; document.getElementById('sets1').innerText = "Win Sets: " + sets1;
+                    activePlayersTeam1.forEach(p => { playerWins[p] = (playerWins[p] || 0) + 1; if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p); });
+                    saveToLocal(); if (typeof autoSyncToCloud === 'function') autoSyncToCloud();
+                    if (confirm(`🎉 ทีม (${team1Name}) ชนะ!\n\nให้ทีมแพ้ (${team2Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) rotateQueue(2); else resetScore();
                 } else {
-                    sets2++;
-                    document.getElementById('sets2').innerText = "Win Sets: " + sets2;
-                    activePlayersTeam2.forEach(p => {
-                        playerWins[p] = (playerWins[p] || 0) + 1;
-                        if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
-                    });
-                    saveToLocal();
-
-                    // ซิงค์คะแนนขึ้น Cloud อัตโนมัติทันที
-                    if (typeof autoSyncToCloud === 'function') {
-                        autoSyncToCloud();
-                    }
-
-                    if (confirm(`🎉 ทีม (${team2Name}) ชนะ!\n\nให้ทีมแพ้ (${team1Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
-                        rotateQueue(1);
-                    } else {
-                        resetScore();
-                    }
+                    sets2++; document.getElementById('sets2').innerText = "Win Sets: " + sets2;
+                    activePlayersTeam2.forEach(p => { playerWins[p] = (playerWins[p] || 0) + 1; if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p); });
+                    saveToLocal(); if (typeof autoSyncToCloud === 'function') autoSyncToCloud();
+                    if (confirm(`🎉 ทีม (${team2Name}) ชนะ!\n\nให้ทีมแพ้ (${team1Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) rotateQueue(1); else resetScore();
                 }
             }
         }
@@ -856,76 +554,45 @@
         function renderLocalLeaderboard() {
             let container = document.getElementById('localLeaderboardListContainer');
             if (!container) return;
-            
             let sortedPlayers = [...savedPlayerHistory].sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
-
             if (sortedPlayers.length === 0 || sortedPlayers.every(p => (playerWins[p] || 0) === 0)) {
-                container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติการชนะในก๊วนเรา ลองเล่นและจบแมตช์ดูก่อนครับ!</div>';
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติการชนะในก๊วนเรา</div>';
                 return;
             }
-
             let html = '';
             sortedPlayers.forEach((name, index) => {
                 let wins = playerWins[name] || 0;
                 let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `#${index + 1}`));
-                html += `
-                    <div class="leaderboard-item">
-                        <span class="leaderboard-rank">${rankIcon}</span>
-                        <span class="leaderboard-name">${name}</span>
-                        <span class="leaderboard-score">ชนะ ${wins} เซต</span>
-                    </div>
-                `;
+                html += `<div class="leaderboard-item"><span class="leaderboard-rank">${rankIcon}</span><span class="leaderboard-name">${name}</span><span class="leaderboard-score">ชนะ ${wins} เซต</span></div>`;
             });
             container.innerHTML = html;
         }
 
         function resetLocalLeaderboard() {
             if (confirm('ต้องการรีเซ็ตสถิติและคะแนนทั้งหมดของก๊วนเราใช่หรือไม่?')) {
-                playerWins = {};
-                savedPlayerHistory = [];
-                saveToLocal();
-                renderLocalLeaderboard();
-                if (typeof renderHistoryTags === 'function') renderHistoryTags();
+                playerWins = {}; savedPlayerHistory = []; saveToLocal(); renderLocalLeaderboard(); renderHistoryTags();
             }
         }
 
         function renderHistoryTags() {
             let container = document.getElementById('historyTagsContainer');
             if (!container) return;
-            
-            if (savedPlayerHistory.length === 0) {
-                container.innerHTML = '<span style="font-size: 11px; color: #888; padding: 4px;">ยังไม่มีประวัติรายชื่อ พิมพ์แล้วระบบจะจำสถิติให้อัตโนมัติ</span>';
-                return;
-            }
-            container.innerHTML = savedPlayerHistory.map(name => {
-                let wins = playerWins[name] || 0;
-                let badge = wins >= 3 ? ' 🔥(โปร)' : '';
-                return `<div class="history-tag" onclick="appendPlayerName('${name}')">+ ${name}${badge}</div>`;
-            }).join('');
+            if (savedPlayerHistory.length === 0) { container.innerHTML = '<span style="font-size: 11px; color: #888; padding: 4px;">ยังไม่มีประวัติรายชื่อ</span>'; return; }
+            container.innerHTML = savedPlayerHistory.map(name => `<div class="history-tag" onclick="appendPlayerName('${name}')">+ ${name}</div>`).join('');
         }
 
         function updateQueueStatusUI() {
             let statusDiv = document.getElementById('queueStatusText');
             if (!statusDiv) return;
-            
-            if (waitingQueue.length === 0) {
-                statusDiv.innerHTML = "<b>คิวที่รออยู่:</b> ยังไม่มีรายชื่อในระบบ";
-            } else {
-                statusDiv.innerHTML = `<b>คิวรอลงสนาม (${waitingQueue.length} คน):</b> ${waitingQueue.join(', ')}`;
-            }
+            statusDiv.innerHTML = waitingQueue.length === 0 ? "<b>คิวที่รออยู่:</b> ยังไม่มีรายชื่อในระบบ" : `<b>คิวรอลงสนาม (${waitingQueue.length} คน):</b> ${waitingQueue.join(', ')}`;
         }
 
         function clearAllHistory() {
-            if (confirm('ต้องการล้างประวัติรายชื่อทั้งหมดหรือไม่?')) {
-                savedPlayerHistory = [];
-                playerWins = {};
-                saveToLocal();
-                renderHistoryTags();
-            }
+            if (confirm('ต้องการล้างประวัติรายชื่อทั้งหมดหรือไม่?')) { savedPlayerHistory = []; playerWins = {}; saveToLocal(); renderHistoryTags(); }
         }
     </script>
 
-    <!-- ระบบ Cloud Firestore กลาง (ซิงค์อัตโนมัติ Real-time) -->
+    <!-- ระบบ Cloud Firestore กลาง -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -944,77 +611,91 @@
         const db = getFirestore(app);
         const rankDocRef = doc(db, "badminton_data", "leaderboard_room");
 
-        // ฟังก์ชันดึงข้อมูลทำเนียบแชมป์โลกจากคลาวด์มาแสดง
+        const discordImageUrl = "https://media.discordapp.net/attachments/1193954420044595220/1561103511016575016/podium.png.png?ex=6ad52270&is=6ad3d0f0&hm=33cecb6ad53ec505528e3e4047670eb9fcf73c63786ad98dd99fd5b020db7612&=&format=webp&quality=lossless&width=1024&height=1024";
+
         window.fetchCloudLeaderboard = async function() {
-            let container = document.getElementById('cloudLeaderboardListContainer');
-            container.innerHTML = '<div style="text-align: center; color: #888; padding: 15px; font-size: 13px;">กำลังโหลดข้อมูลจากคลาวด์...</div>';
+            let containerWrapper = document.getElementById('imagePodiumContainer');
+            let listContainer = document.getElementById('cloudLeaderboardListContainer');
+            listContainer.innerHTML = '';
 
             try {
                 let docSnap = await getDoc(rankDocRef);
+                
+                let imageHtml = `<img src="${discordImageUrl}" alt="Podium">`;
+
                 if (docSnap.exists()) {
                     let data = docSnap.data();
                     let cloudWins = data.wins || {};
                     let cloudHistory = data.history || [];
-
                     let sortedPlayers = [...cloudHistory].sort((a, b) => (cloudWins[b] || 0) - (cloudWins[a] || 0));
 
-                    if (sortedPlayers.length === 0 || sortedPlayers.every(p => (cloudWins[p] || 0) === 0)) {
-                        container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติบนคลาวด์ ลองเล่นและจบแมตช์เพื่อซิงค์คะแนนอัตโนมัติครับ!</div>';
-                        return;
-                    }
+                    let top1 = sortedPlayers[0] ? { name: sortedPlayers[0], wins: cloudWins[sortedPlayers[0]] || 0 } : null;
+                    let top2 = sortedPlayers[1] ? { name: sortedPlayers[1], wins: cloudWins[sortedPlayers[1]] || 0 } : null;
+                    let top3 = sortedPlayers[2] ? { name: sortedPlayers[2], wins: cloudWins[sortedPlayers[2]] || 0 } : null;
 
-                    let html = '';
-                    sortedPlayers.forEach((name, index) => {
-                        let wins = cloudWins[name] || 0;
-                        let rankIcon = index === 0 ? '👑' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `#${index + 1}`));
-                        html += `
-                            <div class="leaderboard-item">
-                                <span class="leaderboard-rank">${rankIcon}</span>
-                                <span class="leaderboard-name">${name}</span>
-                                <span class="leaderboard-score">ชนะ ${wins} เซต</span>
+                    if (top1) {
+                        imageHtml += `
+                            <div class="overlay-card overlay-rank-1">
+                                <div class="overlay-name">👑 ${top1.name}</div>
+                                <div class="overlay-sets">ชนะ ${top1.wins} เซต</div>
                             </div>
                         `;
-                    });
-                    container.innerHTML = html;
+                    }
+                    if (top2) {
+                        imageHtml += `
+                            <div class="overlay-card overlay-rank-2">
+                                <div class="overlay-name">🥈 ${top2.name}</div>
+                                <div class="overlay-sets">ชนะ ${top2.wins} เซต</div>
+                            </div>
+                        `;
+                    }
+                    if (top3) {
+                        imageHtml += `
+                            <div class="overlay-card overlay-rank-3">
+                                <div class="overlay-name">🥉 ${top3.name}</div>
+                                <div class="overlay-sets">ชนะ ${top3.wins} เซต</div>
+                            </div>
+                        `;
+                    }
+
+                    containerWrapper.innerHTML = imageHtml;
+
+                    let restPlayers = sortedPlayers.slice(3);
+                    if (restPlayers.length > 0) {
+                        let listHtml = '';
+                        restPlayers.forEach((name, index) => {
+                            let wins = cloudWins[name] || 0;
+                            listHtml += `<div class="leaderboard-item"><span class="leaderboard-rank">#${index + 4}</span><span class="leaderboard-name">${name}</span><span class="leaderboard-score">ชนะ ${wins} เซต</span></div>`;
+                        });
+                        listContainer.innerHTML = listHtml;
+                    } else {
+                        listContainer.innerHTML = '<div style="text-align: center; color: #777; font-size: 11px; padding: 5px;">แสดงอันดับท็อป 3 บนโพเดียมครบแล้ว</div>';
+                    }
                 } else {
-                    container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีข้อมูลบนคลาวด์กลาง</div>';
+                    containerWrapper.innerHTML = imageHtml;
                 }
             } catch (e) {
                 console.error("Error fetching cloud: ", e);
-                container.innerHTML = '<div style="text-align: center; color: #ff3b30; padding: 20px; font-size: 13px;">เกิดข้อผิดพลาดในการโหลดข้อมูล (โปรดตรวจสอบการเปิดใช้งาน Firestore ใน Firebase Console)</div>';
             }
         };
 
-        // ฟังก์ชันซิงค์คะแนนขึ้นคลาวด์กลางโดยอัตโนมัติเมื่อจบเกม
         window.autoSyncToCloud = async function() {
             try {
                 let docSnap = await getDoc(rankDocRef);
-                let existingWins = {};
-                let existingHistory = [];
-
+                let existingWins = {}, existingHistory = [];
                 if (docSnap.exists()) {
                     let data = docSnap.data();
                     existingWins = data.wins || {};
                     existingHistory = data.history || [];
                 }
-
                 for (let name in playerWins) {
                     existingWins[name] = Math.max(existingWins[name] || 0, playerWins[name]);
-                    if (!existingHistory.includes(name)) {
-                        existingHistory.push(name);
-                    }
+                    if (!existingHistory.includes(name)) existingHistory.push(name);
                 }
-
-                await setDoc(rankDocRef, {
-                    wins: existingWins,
-                    history: existingHistory
-                }, { merge: true });
-            } catch (e) {
-                console.error("Auto sync error: ", e);
-            }
+                await setDoc(rankDocRef, { wins: existingWins, history: existingHistory }, { merge: true });
+            } catch (e) { console.error("Auto sync error: ", e); }
         };
 
-        // ฟังก์ชันรีเซ็ตคลาวด์กลาง
         window.resetCloudLeaderboardSecure = async function() {
             let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตคลาวด์กลาง:");
             if (pin === ADMIN_PIN) {
@@ -1023,14 +704,9 @@
                         await setDoc(rankDocRef, { wins: {}, history: [] });
                         fetchCloudLeaderboard();
                         alert('🗑️ ล้างสถิติคลาวด์กลางเรียบร้อย!');
-                    } catch (e) {
-                        console.error("Reset error: ", e);
-                        alert('❌ ไม่สามารถรีเซ็ตได้');
-                    }
+                    } catch (e) { alert('❌ ไม่สามารถรีเซ็ตได้'); }
                 }
-            } else if (pin !== null) {
-                alert("❌ รหัสผ่านไม่ถูกต้อง!");
-            }
+            } else if (pin !== null) { alert("❌ รหัสผ่านไม่ถูกต้อง!"); }
         };
     </script>
 
