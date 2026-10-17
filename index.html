@@ -470,7 +470,7 @@
     <!-- ปุ่มวงกลมใสๆ ลอยขวาบน สำหรับกดดูตารางอันดับมือโปร -->
     <div class="floating-rank-btn" onclick="openRankModal()">🏆</div>
 
-    <!-- กล่องข้อความแจ้งเตือน Deuce กลางจอ -->
+    <!-- กล่องข้อความแจ้งเตือน DEUCE กลางจอ -->
     <div class="deuce-toast" id="deuceToast">DEUCE!</div>
 
     <!-- ฝั่งที่ 1 (ทีม A) -->
@@ -596,7 +596,6 @@
         let playerWins = {};
         let lastDeuceState = false;
 
-        // รหัสผ่านแอดมินสำหรับรีเซ็ตตารางอันดับ (PIN: 1234)
         const ADMIN_PIN = "1234";
 
         const rankDocRef = doc(db, "badminton_data", "leaderboard_room");
@@ -750,6 +749,7 @@
             }
         }
 
+        // ฟังก์ชันจัดคิวและสลับมือโปรเข้าสนาม
         window.setupQueueAndPlay = async function() {
             let rawText = document.getElementById('playerNames').value.trim();
             let players = rawText.split('\n').map(p => p.trim()).filter(p => p.length > 0);
@@ -869,6 +869,7 @@
             lastDeuceState = isCurrentlyDeuce;
         }
 
+        // ฟังก์ชันเช็คผู้ชนะและถามยืนยันดึงคิวอัตโนมัติ
         window.checkWin = async function() {
             let diff = Math.abs(score1 - score2);
             let hasWon = false;
