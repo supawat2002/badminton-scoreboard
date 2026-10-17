@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Badminton Queue & Score Pro</title>
-    <!-- ดึงฟอนต์ตัวเลขสวยๆ (Outfit / Inter) จาก Google Fonts มาใช้ -->
+    <!-- ดึงฟอนต์ตัวเลขสวยๆ จาก Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -23,7 +23,7 @@
             position: relative;
         }
 
-        /* ปุ่มวงกลมใสๆ ลอยขวาบน สำหรับกดดูตารางอันดับมือโปร (Leaderboard) */
+        /* ปุ่มวงกลมใสๆ ลอยขวาบน สำหรับกดดูตารางอันดับมือโปร */
         .floating-rank-btn {
             position: fixed;
             top: 20px;
@@ -134,7 +134,7 @@
             margin-bottom: 5px;
         }
 
-        /* ฟอนต์ตัวเลขสกอร์แบบพรีเมียม โมเดิร์น */
+        /* ฟอนต์ตัวเลขสกอร์ */
         .score {
             font-family: 'Outfit', sans-serif;
             font-size: 110px;
@@ -175,7 +175,7 @@
             font-size: 26px;
         }
 
-        /* แถบควบคุมด้านล่างแบบโปร่งใส มินิมอล (Glassmorphism) */
+        /* แถบควบคุมด้านล่าง (Glassmorphism) */
         .control-dock {
             position: fixed;
             bottom: 20px;
@@ -352,7 +352,7 @@
             background: rgba(255, 59, 48, 0.1);
         }
 
-        /* ตารางอันดับ (Leaderboard) */
+        /* ตารางอันดับ */
         .leaderboard-list {
             background: #f9f9fb;
             border-radius: 12px;
@@ -397,7 +397,6 @@
             font-size: 12px;
         }
 
-        /* สไตล์แถบประวัติแท็กรายชื่อ */
         .history-tags-container {
             display: flex;
             gap: 6px;
@@ -494,9 +493,9 @@
         </div>
     </div>
 
-    <!-- แถบควบคุมด้านล่างกระจกใส มินิมอล -->
+    <!-- แถบควบคุมด้านล่าง -->
     <div class="control-dock" onclick="event.stopPropagation()">
-        <button class="dock-btn reset-dock-btn" onclick="resetMatch()">🔄 รีเซ็ต</button>
+        <button class="dock-btn reset-dock-btn" onclick="resetMatchSecure()">🔄 รีเซ็ต</button>
         <button class="dock-btn queue-dock-btn" onclick="openModal()">👥 จัดคิวสมดุล</button>
 
         <div class="color-picker-wrapper">
@@ -519,7 +518,7 @@
         </div>
     </div>
 
-    <!-- หน้าต่างจัดการรายชื่อและคิว (Modal) -->
+    <!-- หน้าต่างจัดการรายชื่อและคิว -->
     <div class="modal-overlay" id="randomModal" onclick="closeModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2>⚖️ จัดคิวสมดุล (เกลี่ยมือโปร vs มือทั่วไป)</h2>
@@ -531,7 +530,7 @@
 
             <div class="label-row">
                 <span>ประวัติรายชื่อเพื่อน (คลิกเพื่อเพิ่ม):</span>
-                <button class="clear-text-btn" onclick="clearAllHistory()">🗑️ ล้างประวัติ</button>
+                <button class="clear-text-btn" onclick="clearAllHistorySecure()">🗑️ ล้างประวัติ</button>
             </div>
 
             <div class="history-tags-container" id="historyTagsContainer"></div>
@@ -551,24 +550,22 @@
         </div>
     </div>
 
-    <!-- หน้าต่างตารางอันดับมือโปร (Leaderboard Modal) -->
+    <!-- หน้าต่างตารางอันดับมือโปร -->
     <div class="modal-overlay" id="rankModal" onclick="closeRankModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2>🏆 ทำเนียบมือโปร (Leaderboard)</h2>
-            <div class="leaderboard-list" id="leaderboardListContainer">
-                <!-- ตารางอันดับจะถูกสร้างอัตโนมัติ -->
-            </div>
+            <div class="leaderboard-list" id="leaderboardListContainer"></div>
             <div class="modal-btn-group">
                 <button class="modal-btn btn-cancel" onclick="closeRankModal()">ปิด</button>
-                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetLeaderboard()">รีเซ็ตสถิติทั้งหมด</button>
+                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetLeaderboardSecure()">รีเซ็ตสถิติทั้งหมด</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK (CDN) -->
+    <!-- Firebase SDK & Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCydHu6xNL4BMJchkuOa7U1wbAoqx1obBA",
@@ -599,7 +596,9 @@
         let playerWins = {};
         let lastDeuceState = false;
 
-        // ดึงข้อมูล Real-time จาก Firebase Firestore ทันทีที่เปิดเว็บ
+        // รหัสผ่านแอดมินสำหรับกดรีเซ็ต / ล้างข้อมูล (สามารถเปลี่ยนตัวเลข PIN ได้ตามต้องการ)
+        const ADMIN_PIN = "1234";
+
         const rankDocRef = doc(db, "badminton_data", "leaderboard_room");
         
         onSnapshot(rankDocRef, (docSnap) => {
@@ -608,7 +607,6 @@
                 playerWins = data.wins || {};
                 savedPlayerHistory = data.history || [];
             } else {
-                // ถ้ายังไม่มีข้อมูล สร้างเอกสารเริ่มต้น
                 setDoc(rankDocRef, { wins: {}, history: [] });
             }
             renderHistoryTags();
@@ -677,28 +675,55 @@
             container.innerHTML = html;
         }
 
-        window.resetLeaderboard = async function() {
-            if (confirm('ต้องการล้างสถิติชัยชนะทั้งหมดของทุกคนหรือไม่?')) {
-                playerWins = {};
-                savedPlayerHistory = [];
-                await saveToCloud();
-                renderLeaderboard();
-                renderHistoryTags();
+        // ระบบตรวจสอบรหัสผ่านแอดมินก่อนรีเซ็ต
+        window.resetLeaderboardSecure = async function() {
+            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตสถิติ:");
+            if (pin === ADMIN_PIN) {
+                if (confirm('ยืนยันการล้างสถิติชัยชนะทั้งหมดหรือไม่?')) {
+                    playerWins = {};
+                    savedPlayerHistory = [];
+                    await saveToCloud();
+                    renderLeaderboard();
+                    renderHistoryTags();
+                }
+            } else if (pin !== null) {
+                alert("❌ รหัสผ่านไม่ถูกต้อง!");
+            }
+        }
+
+        window.resetMatchSecure = function() {
+            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตแมตช์:");
+            if (pin === ADMIN_PIN) {
+                if (confirm('ต้องการรีเซ็ตคะแนนและจำนวนเซตทั้งหมดหรือไม่?')) {
+                    sets1 = 0;
+                    sets2 = 0;
+                    lastDeuceState = false;
+                    document.getElementById('sets1').innerText = "Win Sets: 0";
+                    document.getElementById('sets2').innerText = "Win Sets: 0";
+                    resetScore();
+                }
+            } else if (pin !== null) {
+                alert("❌ รหัสผ่านไม่ถูกต้อง!");
+            }
+        }
+
+        window.clearAllHistorySecure = async function() {
+            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อล้างประวัติ:");
+            if (pin === ADMIN_PIN) {
+                if (confirm('ต้องการล้างประวัติรายชื่อทั้งหมดหรือไม่?')) {
+                    savedPlayerHistory = [];
+                    playerWins = {};
+                    await saveToCloud();
+                    renderHistoryTags();
+                }
+            } else if (pin !== null) {
+                alert("❌ รหัสผ่านไม่ถูกต้อง!");
             }
         }
 
         window.clearPlayerInput = function() {
             document.getElementById('playerNames').value = '';
             document.getElementById('playerNames').focus();
-        }
-
-        window.clearAllHistory = async function() {
-            if (confirm('ต้องการล้างประวัติรายชื่อและสถิติทั้งหมดหรือไม่?')) {
-                savedPlayerHistory = [];
-                playerWins = {};
-                await saveToCloud();
-                renderHistoryTags();
-            }
         }
 
         window.renderHistoryTags = function() {
@@ -758,8 +783,7 @@
 
             await saveToCloud();
 
-            let totalActiveNeeded = requiredCount;
-            let activePool = players.splice(0, totalActiveNeeded);
+            let activePool = players.splice(0, requiredCount);
             waitingQueue = players;
 
             activePool.sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
@@ -787,8 +811,8 @@
 
             updateTeamNamesUI();
             closeModal();
-            resetMatch();
-            alert('⚖️ จัดคิวสมดุล (เกลี่ยมือโปร/มือใหม่) เรียบร้อย!');
+            resetScore();
+            alert('⚖️ จัดคิวสมดุลเรียบร้อย!');
         }
 
         window.updateTeamNamesUI = function() {
@@ -916,17 +940,6 @@
             lastDeuceState = false;
             document.getElementById('score1').innerText = score1;
             document.getElementById('score2').innerText = score2;
-        }
-
-        window.resetMatch = function() {
-            if (confirm('ต้องการรีเซ็ตคะแนนและจำนวนเซตทั้งหมดหรือไม่?')) {
-                sets1 = 0;
-                sets2 = 0;
-                lastDeuceState = false;
-                document.getElementById('sets1').innerText = "Win Sets: 0";
-                document.getElementById('sets2').innerText = "Win Sets: 0";
-                resetScore();
-            }
         }
 
         window.changeTeamStyle = function(team, color) {
