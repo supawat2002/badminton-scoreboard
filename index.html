@@ -22,10 +22,16 @@
             position: relative;
         }
 
-        .floating-rank-btn {
+        .top-right-btns {
             position: fixed;
             top: 20px;
             right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .floating-btn {
             width: 45px;
             height: 45px;
             border-radius: 50%;
@@ -39,15 +45,14 @@
             align-items: center;
             font-size: 20px;
             cursor: pointer;
-            z-index: 1000;
             transition: transform 0.1s, background 0.2s;
         }
 
-        .floating-rank-btn:hover {
+        .floating-btn:hover {
             background: rgba(255, 255, 255, 0.85);
         }
 
-        .floating-rank-btn:active {
+        .floating-btn:active {
             transform: scale(0.92);
         }
 
@@ -459,7 +464,12 @@
 </head>
 <body>
 
-    <div class="floating-rank-btn" onclick="openRankModal()">🏆</div>
+    <!-- ปุ่มเปิดตารางแรงค์ (📊 ก๊วนเรา | 🏆 ทำเนียบแชมป์โลก Cloud) -->
+    <div class="top-right-btns">
+        <div class="floating-btn" onclick="openLocalRankModal()" title="แรงค์ก๊วนเราเอง">📊</div>
+        <div class="floating-btn" onclick="openCloudRankModal()" title="ทำเนียบแชมป์โลก (Cloud)">🏆</div>
+    </div>
+
     <div class="deuce-toast" id="deuceToast">DEUCE!</div>
 
     <div class="team-container team-1" id="container1" onclick="handleAreaClick(1)">
@@ -535,18 +545,34 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="rankModal" onclick="closeRankModal()">
+    <!-- หน้าต่างแสดงแรงค์เฉพาะก๊วนเรา (เปิดผ่านปุ่ม 📊) -->
+    <div class="modal-overlay" id="localRankModal" onclick="closeLocalRankModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h2>🏆 ทำเนียบมือโปร (Leaderboard)</h2>
-            <div class="leaderboard-list" id="leaderboardListContainer"></div>
+            <h2>📊 ตารางแรงค์ (เฉพาะก๊วนเรา)</h2>
+            <div class="leaderboard-list" id="localLeaderboardListContainer"></div>
             <div class="modal-btn-group">
-                <button class="modal-btn btn-cancel" onclick="closeRankModal()">ปิด</button>
-                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetLeaderboardSecure()">รีเซ็ตสถิติทั้งหมด</button>
+                <button class="modal-btn btn-cancel" onclick="closeLocalRankModal()">ปิด</button>
+                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetLocalLeaderboard()">รีเซ็ตสถิติก๊วนเรา</button>
             </div>
         </div>
     </div>
 
-    <!-- Global UI Functions -->
+    <!-- หน้าต่างทำเนียบแชมป์โลก Cloud (เปิดผ่านปุ่ม 🏆) -->
+    <div class="modal-overlay" id="cloudRankModal" onclick="closeCloudRankModal()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <h2>🏆 ทำเนียบแชมป์โลก (Cloud Leaderboard)</h2>
+            <p style="font-size: 11px; color: #666; margin-bottom: 10px;">สถิติรวมออนไลน์จากระบบกลาง</p>
+            <div class="leaderboard-list" id="cloudLeaderboardListContainer">
+                <div style="text-align: center; color: #888; padding: 15px; font-size: 13px;">กำลังเชื่อมต่อคลาวด์...</div>
+            </div>
+            <div class="modal-btn-group">
+                <button class="modal-btn btn-cancel" onclick="closeCloudRankModal()">ปิด</button>
+                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetCloudLeaderboardSecure()">รีเซ็ตคลาวด์กลาง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ระบบหลักประจำก๊วน (Local Storage) -->
     <script>
         let score1 = 0;
         let score2 = 0;
@@ -560,28 +586,44 @@
         let activePlayersTeam2 = [];
         let currentMatchType = 2;
 
-        let savedPlayerHistory = [];
-        let playerWins = {};
+        let savedPlayerHistory = JSON.parse(localStorage.getItem('badminton_history') || '[]');
+        let playerWins = JSON.parse(localStorage.getItem('badminton_wins') || '{}');
         let lastDeuceState = false;
         const ADMIN_PIN = "1234";
 
+        function saveToLocal() {
+            localStorage.setItem('badminton_history', JSON.stringify(savedPlayerHistory));
+            localStorage.setItem('badminton_wins', JSON.stringify(playerWins));
+        }
+
         function openModal() {
             document.getElementById('randomModal').style.display = 'flex';
-            if (typeof renderHistoryTags === 'function') renderHistoryTags();
-            if (typeof updateQueueStatusUI === 'function') updateQueueStatusUI();
+            renderHistoryTags();
+            updateQueueStatusUI();
         }
 
         function closeModal() {
             document.getElementById('randomModal').style.display = 'none';
         }
 
-        function openRankModal() {
-            document.getElementById('rankModal').style.display = 'flex';
-            if (typeof renderLeaderboard === 'function') renderLeaderboard();
+        function openLocalRankModal() {
+            document.getElementById('localRankModal').style.display = 'flex';
+            renderLocalLeaderboard();
         }
 
-        function closeRankModal() {
-            document.getElementById('rankModal').style.display = 'none';
+        function closeLocalRankModal() {
+            document.getElementById('localRankModal').style.display = 'none';
+        }
+
+        function openCloudRankModal() {
+            document.getElementById('cloudRankModal').style.display = 'flex';
+            if (typeof fetchCloudLeaderboard === 'function') {
+                fetchCloudLeaderboard();
+            }
+        }
+
+        function closeCloudRankModal() {
+            document.getElementById('cloudRankModal').style.display = 'none';
         }
 
         function showDeuceToast() {
@@ -701,7 +743,6 @@
             container.style.color = brightness < 128 ? '#ffffff' : '#111111';
         }
 
-        // ฟังก์ชันสลับตำแหน่งรายชื่อแบบสุ่มจับฉลาก (Random Shuffle) แท้ 100%
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 let j = Math.floor(Math.random() * (i + 1));
@@ -721,17 +762,14 @@
                 return;
             }
 
-            // บันทึกชื่อเข้าประวัติกลาง
             players.forEach(name => {
                 if (!savedPlayerHistory.includes(name)) savedPlayerHistory.push(name);
                 if (!(name in playerWins)) playerWins[name] = 0;
             });
 
-            if (typeof saveToCloud === 'function') saveToCloud();
+            saveToLocal();
 
-            // สุ่มรายชื่อทั้งหมดสลับตำแหน่งมั่วกันก่อนแจกแจงลงสนาม (Random Shuffle)
             let shuffledPlayers = shuffleArray([...players]);
-
             let activePool = shuffledPlayers.splice(0, requiredCount);
             waitingQueue = shuffledPlayers;
 
@@ -755,7 +793,7 @@
             updateTeamNamesUI();
             closeModal();
             resetMatch();
-            if (typeof updateQueueStatusUI === 'function') updateQueueStatusUI();
+            updateQueueStatusUI();
             alert('🎲 สุ่มจับคู่รายชื่อลงสนามเรียบร้อย!');
         }
 
@@ -780,7 +818,12 @@
                         playerWins[p] = (playerWins[p] || 0) + 1;
                         if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
                     });
-                    if (typeof saveToCloud === 'function') saveToCloud();
+                    saveToLocal();
+                    
+                    // ซิงค์คะแนนขึ้น Cloud อัตโนมัติทันที
+                    if (typeof autoSyncToCloud === 'function') {
+                        autoSyncToCloud();
+                    }
 
                     if (confirm(`🎉 ทีม (${team1Name}) ชนะ!\n\nให้ทีมแพ้ (${team2Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
                         rotateQueue(2);
@@ -794,7 +837,12 @@
                         playerWins[p] = (playerWins[p] || 0) + 1;
                         if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p);
                     });
-                    if (typeof saveToCloud === 'function') saveToCloud();
+                    saveToLocal();
+
+                    // ซิงค์คะแนนขึ้น Cloud อัตโนมัติทันที
+                    if (typeof autoSyncToCloud === 'function') {
+                        autoSyncToCloud();
+                    }
 
                     if (confirm(`🎉 ทีม (${team2Name}) ชนะ!\n\nให้ทีมแพ้ (${team1Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) {
                         rotateQueue(1);
@@ -805,12 +853,14 @@
             }
         }
 
-        function renderLeaderboard() {
-            let container = document.getElementById('leaderboardListContainer');
+        function renderLocalLeaderboard() {
+            let container = document.getElementById('localLeaderboardListContainer');
+            if (!container) return;
+            
             let sortedPlayers = [...savedPlayerHistory].sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
 
             if (sortedPlayers.length === 0 || sortedPlayers.every(p => (playerWins[p] || 0) === 0)) {
-                container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติการชนะ ลองเล่นและจบแมตช์ดูก่อนครับ!</div>';
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติการชนะในก๊วนเรา ลองเล่นและจบแมตช์ดูก่อนครับ!</div>';
                 return;
             }
 
@@ -829,8 +879,20 @@
             container.innerHTML = html;
         }
 
+        function resetLocalLeaderboard() {
+            if (confirm('ต้องการรีเซ็ตสถิติและคะแนนทั้งหมดของก๊วนเราใช่หรือไม่?')) {
+                playerWins = {};
+                savedPlayerHistory = [];
+                saveToLocal();
+                renderLocalLeaderboard();
+                if (typeof renderHistoryTags === 'function') renderHistoryTags();
+            }
+        }
+
         function renderHistoryTags() {
             let container = document.getElementById('historyTagsContainer');
+            if (!container) return;
+            
             if (savedPlayerHistory.length === 0) {
                 container.innerHTML = '<span style="font-size: 11px; color: #888; padding: 4px;">ยังไม่มีประวัติรายชื่อ พิมพ์แล้วระบบจะจำสถิติให้อัตโนมัติ</span>';
                 return;
@@ -844,6 +906,8 @@
 
         function updateQueueStatusUI() {
             let statusDiv = document.getElementById('queueStatusText');
+            if (!statusDiv) return;
+            
             if (waitingQueue.length === 0) {
                 statusDiv.innerHTML = "<b>คิวที่รออยู่:</b> ยังไม่มีรายชื่อในระบบ";
             } else {
@@ -851,35 +915,20 @@
             }
         }
 
-        function resetLeaderboardSecure() {
-            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตสถิติทั้งหมด:");
-            if (pin === ADMIN_PIN) {
-                if (confirm('ยืนยันการล้างสถิติชัยชนะทั้งหมดหรือไม่?')) {
-                    playerWins = {};
-                    savedPlayerHistory = [];
-                    if (typeof saveToCloud === 'function') saveToCloud();
-                    renderLeaderboard();
-                    renderHistoryTags();
-                }
-            } else if (pin !== null) {
-                alert("❌ รหัสผ่านไม่ถูกต้อง!");
-            }
-        }
-
         function clearAllHistory() {
             if (confirm('ต้องการล้างประวัติรายชื่อทั้งหมดหรือไม่?')) {
                 savedPlayerHistory = [];
                 playerWins = {};
-                if (typeof saveToCloud === 'function') saveToCloud();
+                saveToLocal();
                 renderHistoryTags();
             }
         }
     </script>
 
-    <!-- Firebase Cloud Sync Script -->
+    <!-- ระบบ Cloud Firestore กลาง (ซิงค์อัตโนมัติ Real-time) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCydHu6xNL4BMJchkuOa7U1wbAoqx1obBA",
@@ -894,29 +943,95 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const rankDocRef = doc(db, "badminton_data", "leaderboard_room");
-        
-        onSnapshot(rankDocRef, (docSnap) => {
-            if (docSnap.exists()) {
-                let data = docSnap.data();
-                playerWins = data.wins || {};
-                savedPlayerHistory = data.history || [];
-            } else {
-                setDoc(rankDocRef, { wins: {}, history: [] });
-            }
-            if (typeof renderHistoryTags === 'function') renderHistoryTags();
-            if (typeof renderLeaderboard === 'function') renderLeaderboard();
-        });
 
-        window.saveToCloud = async function() {
+        // ฟังก์ชันดึงข้อมูลทำเนียบแชมป์โลกจากคลาวด์มาแสดง
+        window.fetchCloudLeaderboard = async function() {
+            let container = document.getElementById('cloudLeaderboardListContainer');
+            container.innerHTML = '<div style="text-align: center; color: #888; padding: 15px; font-size: 13px;">กำลังโหลดข้อมูลจากคลาวด์...</div>';
+
             try {
+                let docSnap = await getDoc(rankDocRef);
+                if (docSnap.exists()) {
+                    let data = docSnap.data();
+                    let cloudWins = data.wins || {};
+                    let cloudHistory = data.history || [];
+
+                    let sortedPlayers = [...cloudHistory].sort((a, b) => (cloudWins[b] || 0) - (cloudWins[a] || 0));
+
+                    if (sortedPlayers.length === 0 || sortedPlayers.every(p => (cloudWins[p] || 0) === 0)) {
+                        container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติบนคลาวด์ ลองเล่นและจบแมตช์เพื่อซิงค์คะแนนอัตโนมัติครับ!</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    sortedPlayers.forEach((name, index) => {
+                        let wins = cloudWins[name] || 0;
+                        let rankIcon = index === 0 ? '👑' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `#${index + 1}`));
+                        html += `
+                            <div class="leaderboard-item">
+                                <span class="leaderboard-rank">${rankIcon}</span>
+                                <span class="leaderboard-name">${name}</span>
+                                <span class="leaderboard-score">ชนะ ${wins} เซต</span>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีข้อมูลบนคลาวด์กลาง</div>';
+                }
+            } catch (e) {
+                console.error("Error fetching cloud: ", e);
+                container.innerHTML = '<div style="text-align: center; color: #ff3b30; padding: 20px; font-size: 13px;">เกิดข้อผิดพลาดในการโหลดข้อมูล (โปรดตรวจสอบการเปิดใช้งาน Firestore ใน Firebase Console)</div>';
+            }
+        };
+
+        // ฟังก์ชันซิงค์คะแนนขึ้นคลาวด์กลางโดยอัตโนมัติเมื่อจบเกม
+        window.autoSyncToCloud = async function() {
+            try {
+                let docSnap = await getDoc(rankDocRef);
+                let existingWins = {};
+                let existingHistory = [];
+
+                if (docSnap.exists()) {
+                    let data = docSnap.data();
+                    existingWins = data.wins || {};
+                    existingHistory = data.history || [];
+                }
+
+                for (let name in playerWins) {
+                    existingWins[name] = Math.max(existingWins[name] || 0, playerWins[name]);
+                    if (!existingHistory.includes(name)) {
+                        existingHistory.push(name);
+                    }
+                }
+
                 await setDoc(rankDocRef, {
-                    wins: playerWins,
-                    history: savedPlayerHistory
+                    wins: existingWins,
+                    history: existingHistory
                 }, { merge: true });
             } catch (e) {
-                console.error("Error saving to cloud: ", e);
+                console.error("Auto sync error: ", e);
             }
-        }
+        };
+
+        // ฟังก์ชันรีเซ็ตคลาวด์กลาง
+        window.resetCloudLeaderboardSecure = async function() {
+            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตคลาวด์กลาง:");
+            if (pin === ADMIN_PIN) {
+                if (confirm('ยืนยันการล้างสถิติตารางแชมป์โลกทั้งหมดบนคลาวด์กลางหรือไม่?')) {
+                    try {
+                        await setDoc(rankDocRef, { wins: {}, history: [] });
+                        fetchCloudLeaderboard();
+                        alert('🗑️ ล้างสถิติคลาวด์กลางเรียบร้อย!');
+                    } catch (e) {
+                        console.error("Reset error: ", e);
+                        alert('❌ ไม่สามารถรีเซ็ตได้');
+                    }
+                }
+            } else if (pin !== null) {
+                alert("❌ รหัสผ่านไม่ถูกต้อง!");
+            }
+        };
     </script>
 
 </body>
