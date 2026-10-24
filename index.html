@@ -3,296 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Badminton Queue & Score Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>QBAD PRO - ระบบจัดการคิว นับคะแนน และค้นหาสนามแบดมินตัน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body, html { height: 100%; display: flex; flex-direction: column; background: #0b0f19; overflow: hidden; position: relative; color: #fff; }
+
+        /* --- พื้นหลังเบลอหนักๆ มินิมอล --- */
+        #homeScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(8, 12, 20, 0.94), rgba(11, 15, 25, 0.96)), 
+                        url('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1920&auto=format&fit=crop&q=80') no-repeat center center;
+            background-size: cover;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 1500;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 20px; overflow-y: auto; transition: opacity 0.3s;
         }
 
-        body, html {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background-color: #f5f5f7;
-            overflow: hidden;
-            position: relative;
+        .glass-container { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 14px; text-align: center; }
+        
+        /* --- ตัวเลขเวลารันสีกราเดี้ยนเคลื่อนไหวสวยๆ --- */
+        .live-clock-wrapper { margin-bottom: 2px; display: flex; flex-direction: column; align-items: center; }
+        .live-time {
+            font-family: 'Outfit', sans-serif; font-size: 44px; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;
+            background-size: 200% auto;
+            animation: gradientShift 4s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .live-date { font-size: 12px; color: #94a3b8; font-weight: 500; letter-spacing: 0.5px; margin-top: 2px; }
+
+        .home-header { margin-bottom: 6px; }
+        .home-header h1 { font-size: 30px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #fff; letter-spacing: 0.5px; }
+        .home-header p { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+        /* --- ช่อง Dropdown เลือกสนาม --- */
+        .court-select-box {
+            width: 100%; padding: 12px 14px; border-radius: 14px;
+            background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(56, 189, 248, 0.4);
+            color: #fff; font-size: 13px; font-weight: 600; outline: none; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .court-select-box option { background: #0f172a; color: #fff; padding: 12px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px; padding: 14px 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.2s; text-align: left;
+        }
+        .glass-card:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
+        .glass-card h3 { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+        .glass-card p { font-size: 11px; color: #94a3b8; }
+
+        .glass-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .glass-menu-item {
+            background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; padding: 14px 6px; text-align: center; cursor: pointer; transition: all 0.2s;
+        }
+        .glass-menu-item:active { transform: scale(0.95); }
+        .glass-menu-item .icon { font-size: 18px; margin-bottom: 4px; display: block; }
+        .glass-menu-item span { font-size: 10px; font-weight: 600; color: #cbd5e1; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .glass-btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%; padding: 14px; border-radius: 16px; font-size: 13px; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
         }
 
-        .top-right-btns {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
+        .top-right-btns { position: fixed; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 1000; }
         .floating-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: background 0.2s;
         }
-
-        .floating-btn:hover { background: rgba(255, 255, 255, 0.85); }
-        .floating-btn:active { transform: scale(0.92); }
+        .floating-btn:hover { background: rgba(255, 255, 255, 0.25); }
 
         .deuce-toast {
-            position: fixed;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffffff;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            pointer-events: none;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 3000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(0,0,0,0.85); color: #fff;
+            padding: 12px 30px; border-radius: 30px; font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 2px;
+            pointer-events: none; opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
         }
         .deuce-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-        .team-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            padding: 10px;
-            user-select: none;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
+        .team-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 10px 10px 50px 10px; user-select: none; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
         .team-1 { background-color: #e3f2fd; color: #222; border-bottom: 2px solid rgba(255,255,255,0.5); }
         .team-2 { background-color: #fbe9e7; color: #222; }
-
-        .team-title-input {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-            color: inherit;
-            text-transform: uppercase;
-            border: none;
-            background: transparent;
-            text-align: center;
-            outline: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: text;
-        }
-
-        .set-badge {
-            font-size: 13px;
-            font-weight: 600;
-            background: rgba(0,0,0,0.08);
-            padding: 2px 10px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-        }
-
-        .score {
-            font-family: 'Outfit', sans-serif;
-            font-size: 110px;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 15px;
-            color: inherit;
-            letter-spacing: -2px;
-        }
-
+        .team-title-input { font-size: 16px; font-weight: 700; letter-spacing: 1px; margin-bottom: 2px; color: inherit; text-transform: uppercase; border: none; background: transparent; text-align: center; outline: none; padding: 4px 12px; border-radius: 6px; cursor: text; }
+        .team-title-input:focus { background: rgba(0,0,0,0.06); }
+        .set-badge { font-size: 12px; font-weight: 600; background: rgba(0,0,0,0.08); padding: 2px 10px; border-radius: 10px; margin-bottom: 4px; }
+        .score { font-family: 'Outfit', sans-serif; font-size: 95px; font-weight: 800; line-height: 1; margin-bottom: 10px; color: inherit; letter-spacing: -2px; }
         .btn-group { display: flex; gap: 15px; }
-        .score-btn {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            font-size: 22px; font-weight: bold; cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        .minus-btn { background-color: rgba(0, 0, 0, 0.08); color: inherit; font-size: 26px; }
+        .score-btn { width: 44px; height: 44px; border-radius: 50%; border: none; font-size: 22px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s; }
+        .score-btn:active { transform: scale(0.92); }
+        .minus-btn { background-color: rgba(0,0,0,0.08); color: inherit; font-size: 24px; }
 
         .control-dock {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(15px);
-            display: flex; gap: 8px; align-items: center; padding: 10px 18px;
-            border-radius: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255, 255, 255, 0.8); z-index: 999;
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(15px);
+            display: flex; gap: 6px; align-items: center; padding: 8px 12px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); border: 1px solid rgba(255, 255, 255, 0.9); z-index: 999; max-width: 96vw; overflow-x: auto;
         }
-
-        .dock-btn {
-            background: rgba(0,0,0,0.06); border: none; padding: 7px 14px;
-            border-radius: 20px; font-size: 12px; font-weight: 600; color: #333; cursor: pointer;
-        }
+        .dock-btn { background: rgba(0,0,0,0.06); border: none; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 600; color: #333; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+        .dock-btn:hover { background: rgba(0,0,0,0.12); }
         .reset-dock-btn { background-color: #ff3b30; color: white; }
         .queue-dock-btn { background-color: #34c759; color: white; }
-
-        .color-picker-wrapper { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #444; }
-        .color-input { appearance: none; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; background: transparent; }
-        .settings-select { background: rgba(0,0,0,0.06); border: none; padding: 7px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #333; outline: none; cursor: pointer; }
+        .home-dock-btn { background-color: #333; color: white; }
+        .calc-dock-btn { background-color: #f59e0b; color: white; }
+        .color-picker-wrapper { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #444; white-space: nowrap; }
+        .color-input { appearance: none; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; background: transparent; }
+        .settings-select { background: rgba(0,0,0,0.06); border: none; padding: 5px 8px; border-radius: 16px; font-size: 11px; font-weight: 600; color: #333; outline: none; cursor: pointer; }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 2000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 13, 0.85); backdrop-filter: blur(20px);
+            display: none; justify-content: center; align-items: center; z-index: 2000; padding: 16px;
         }
-
         .modal-card {
-            background: white; padding: 25px; border-radius: 24px;
-            width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            text-align: center; max-height: 90vh; overflow-y: auto;
+            background: linear-gradient(145deg, #161e31 0%, #0f172a 100%); padding: 24px; border-radius: 28px; width: 100%; max-width: 500px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7); color: #f8fafc; border: 1.5px solid rgba(255,255,255,0.12); text-align: center; max-height: 90vh; overflow-y: auto;
         }
+        .label-row-clean { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: #cbd5e1; text-align: left; }
+        .clear-btn-styled { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .history-tags-container { display: flex; flex-wrap: wrap; gap: 6px; max-height: 90px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left; margin-bottom: 4px; }
+        .history-tag { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 4px 10px; border-radius: 12px; font-size: 11px; cursor: pointer; }
+        .queue-status { font-size: 12px; color: #94a3b8; margin: 10px 0; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; text-align: left; }
 
-        .modal-card h2 { margin-bottom: 12px; font-size: 18px; color: #333; }
-        .modal-card select, .modal-card textarea {
-            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #ddd; font-size: 14px; background: #fafafa;
+        /* --- ตารางสรุปสถิติแบบละเอียด --- */
+        .detailed-table-card { max-width: 650px !important; padding: 20px !important; }
+        .summary-table-container { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; text-align: left; margin-top: 10px; padding-right: 4px; }
+        
+        .summary-row {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 10px 14px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
         }
-        .modal-card textarea { height: 80px; resize: none; }
+        .summary-row.rank-1 { background: linear-gradient(135deg, rgba(251, 191, 36, 0.18) 0%, rgba(255,255,255,0.04) 100%); border-color: rgba(251, 191, 36, 0.4); }
+        .summary-row.rank-2 { background: linear-gradient(135deg, rgba(148, 163, 184, 0.15) 0%, rgba(255,255,255,0.04) 100%); border-color: rgba(148, 163, 184, 0.3); }
+        .summary-row.rank-3 { background: linear-gradient(135deg, rgba(180, 83, 9, 0.15) 0%, rgba(255,255,255,0.04) 100%); border-color: rgba(180, 83, 9, 0.3); }
 
-        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .label-row span { font-size: 12px; font-weight: 600; color: #666; }
-        .clear-text-btn { background: none; border: none; color: #ff3b30; font-size: 12px; font-weight: 600; cursor: pointer; padding: 2px 6px; }
+        .sum-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        .sum-rank { font-size: 15px; font-weight: 800; color: #fbbf24; width: 24px; text-align: center; }
+        .sum-user-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+        .sum-username { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sum-court-tag { font-size: 10px; color: #38bdf8; font-weight: 500; }
+        
+        .history-boxes-row { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; max-width: 240px; }
+        .match-box-item { width: 20px; height: 20px; border-radius: 4px; font-size: 10px; font-weight: 800; display: flex; justify-content: center; align-items: center; color: #fff; }
+        .box-win { background: #10b981; }
+        .box-lose { background: #ef4444; }
 
-        /* --- สไตล์หน้าต่างทำเนียบแชมป์ (ปรับแต่งรูปให้พอดีกรอบ และเอาป้ายชื่อไว้บนหัวเป๊ะๆ) --- */
-        .cloud-modal-card {
-            background: #111318 !important;
-            color: #ffffff !important;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.15);
+        .sum-stats-right { display: flex; gap: 14px; align-items: center; text-align: right; }
+        .sum-nums { font-size: 11px; color: #94a3b8; font-weight: 600; line-height: 1.2; }
+        .sum-winrate { font-size: 15px; font-weight: 800; color: #34d399; font-family: 'Outfit', sans-serif; min-width: 48px; }
+
+        /* --- ทำเนียบแชมป์ 3D Podium พร้อมระบบสำรองรูปภาพ --- */
+        .cloud-modal-card { max-width: 580px !important; padding: 20px !important; }
+        .image-podium-wrapper { position: relative; width: 100%; max-width: 380px; margin: 0 auto 12px auto; border-radius: 20px; overflow: visible; background: #0f172a; border: 1.5px solid rgba(255,255,255,0.2); min-height: 200px; display: flex; justify-content: center; align-items: center; }
+        .image-podium-wrapper img { width: 100%; display: block; height: auto; border-radius: 20px; }
+        .overlay-card { position: absolute; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1.5px solid rgba(255, 255, 255, 0.25); padding: 5px 9px; border-radius: 12px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.6); z-index: 20; min-width: 95px; }
+        .overlay-rank-1 { top: -8px; left: 50%; transform: translateX(-50%); border-color: #fbbf24; }
+        .overlay-rank-2 { top: 12%; left: 3%; border-color: #94a3b8; }
+        .overlay-rank-3 { top: 18%; right: 3%; border-color: #b45309; }
+        .overlay-name { font-size: 11px; font-weight: 800; color: #fff; white-space: nowrap; margin-bottom: 1px; }
+        .overlay-sets { font-size: 9px; font-weight: 700; color: #34d399; }
+        .overlay-winrate { font-size: 8px; color: #38bdf8; }
+
+        .leaderboard-list-box { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-top: 10px; text-align: left; padding-right: 4px; }
+        .cloud-row-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+
+        /* --- แผนที่ & ข้อมูลสนาม --- */
+        .modal-card-split {
+            background: linear-gradient(145deg, #161e31 0%, #0f172a 100%); padding: 24px; border-radius: 32px;
+            width: 100%; max-width: 960px; box-shadow: 0 30px 70px rgba(0,0,0,0.7); color: #f8fafc; border: 1.5px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; max-height: 92vh;
         }
+        .split-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; flex: 1; overflow: hidden; margin-bottom: 14px; }
+        @media (max-width: 768px) { .split-layout { grid-template-columns: 1fr; overflow-y: auto; } }
+        .split-left { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 4px; }
+        .split-right { background: rgba(255, 255, 255, 0.03); border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; overflow-y: auto; }
 
-        .cloud-modal-card h2 {
-            color: #ffd700 !important;
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-        }
+        .court-image-preview { width: 100%; height: 150px; border-radius: 12px; object-fit: cover; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .map-box-wrapper { position: relative; width: 100%; height: 240px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); background: #0f172a; }
+        #interactiveMap { width: 100%; height: 100%; }
 
-        .image-podium-wrapper {
-            position: relative;
-            width: 100%;
-            height: 280px;
-            border-radius: 16px;
-            overflow: hidden;
-            margin: 15px 0;
-            background: #000;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .map-search-bar-floating { position: absolute; top: 10px; left: 10px; right: 10px; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 14px; display: flex; align-items: center; gap: 8px; z-index: 20; }
+        .map-search-bar-floating input { background: transparent; border: none; color: #fff; font-size: 13px; outline: none; width: 100%; }
+        .map-filter-chips { position: absolute; top: 56px; left: 10px; right: 10px; display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; z-index: 20; scrollbar-width: none; }
+        .map-chip { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15); padding: 5px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; color: #e2e8f0; white-space: nowrap; cursor: pointer; }
+        .map-chip.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
+        .reset-map-btn { position: absolute; bottom: 12px; left: 12px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: #38bdf8; padding: 5px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; z-index: 20; cursor: pointer; }
 
-        .image-podium-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* ปรับขนาดรูปให้เข้ากับกรอบพอดี ไม่โดนตัดขอบ */
-        }
+        .court-list-container-mini { display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; }
+        .court-list-item { background: rgba(255, 255, 255, 0.04); border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .court-list-item.selected { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.5); }
+        .court-list-item h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .court-list-item p { font-size: 11px; color: #94a3b8; }
+        .add-custom-court-box { background: rgba(16, 185, 129, 0.08); border: 1.5px dashed rgba(16, 185, 129, 0.4); border-radius: 14px; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 700; color: #34d399; }
 
-        .overlay-card {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px);
-            padding: 4px 8px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            z-index: 2;
-            max-width: 100px;
-        }
-
-        .overlay-name {
-            font-size: 11px;
-            font-weight: 800;
-            color: #fff;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .overlay-sets {
-            font-size: 9px;
-            font-weight: 700;
-            color: #38ef7d;
-        }
-
-        /* --- พิกัดป้ายชื่อขึ้นไปอยู่บนหัวตัวละครแต่ละคน --- */
-        .overlay-rank-1 { top: 2%; left: 50%; transform: translateX(-50%); border-color: #ffd700; }
-        .overlay-rank-1 .overlay-name { color: #ffd700; }
-
-        .overlay-rank-2 { top: 12%; left: 24%; transform: translateX(-50%); border-color: #c0c0c0; }
-        .overlay-rank-2 .overlay-name { color: #c0c0c0; }
-
-        .overlay-rank-3 { top: 15%; left: 76%; transform: translateX(-50%); border-color: #cd7f32; }
-        .overlay-rank-3 .overlay-name { color: #cd7f32; }
-
-        .leaderboard-list {
-            background: #1a1d24;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 8px;
-            margin-bottom: 15px;
-            max-height: 140px;
-            overflow-y: auto;
-            text-align: left;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 7px 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 13px;
-        }
-
-        .leaderboard-item:last-child { border-bottom: none; }
-        .leaderboard-rank { font-weight: 700; color: #aaa; width: 30px; }
-        .leaderboard-name { flex: 1; font-weight: 600; color: #fff; }
-        .leaderboard-score { font-weight: 700; color: #38ef7d; font-size: 12px; }
-
-        .history-tags-container {
-            display: flex; gap: 6px; flex-wrap: wrap; max-height: 70px;
-            overflow-y: auto; margin-bottom: 12px; padding: 4px; background: #f4f4f6; border-radius: 10px; text-align: left;
-        }
-        .history-tag {
-            background: #ffffff; border: 1px solid #ddd; padding: 4px 10px;
-            border-radius: 15px; font-size: 11px; font-weight: 600; color: #333; cursor: pointer;
-        }
-
-        .queue-status { background: #f0f0f5; padding: 10px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; text-align: left; color: #444; }
+        .modal-card h2 { margin-bottom: 4px; font-size: 20px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #fff; }
+        .modal-card p { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+        .modal-card select, .modal-card input, .modal-card textarea { width: 100%; padding: 10px 14px; margin-bottom: 10px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.1); font-size: 13px; background: rgba(255,255,255,0.05); outline: none; color: #fff; }
+        .modal-card select option { background: #0f172a; color: #fff; }
         .modal-btn-group { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
-        .btn-confirm { background: #007aff; color: white; }
-        .btn-cancel { background: #2a2f3d; color: #fff; }
+        .modal-btn { flex: 1; padding: 11px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 13px; text-decoration: none; text-align: center; display: flex; justify-content: center; align-items: center; gap: 6px; }
+        .btn-confirm { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+        .btn-cancel { background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.12); }
     </style>
 </head>
 <body>
 
+    <!-- หน้าแรก -->
+    <div id="homeScreen">
+        <div class="glass-container">
+            <div class="home-header">
+                <h1>QBAD PRO</h1>
+                <div class="live-clock-wrapper">
+                    <div class="live-time" id="liveTimeText">00:00:00</div>
+                    <div class="live-date" id="liveDateText">กำลังโหลด...</div>
+                </div>
+                <p>ระบบจัดการคิว นับคะแนน และค้นหาสนามแบดมินตัน</p>
+            </div>
+
+            <!-- เลือกสนามล่าสุดประจำแมตช์ -->
+            <div style="text-align: left; font-size: 11px; color: #94a3b8; margin-bottom: -6px; font-weight: 600;">🏟️ เลือกสนามที่กำลังไปตีล่าสุด:</div>
+            <select id="activeMatchCourtSelect" class="court-select-box" onchange="updateActiveMatchCourt(this.value)">
+                <option value="ยังไม่ได้ระบุสนาม">-- เลือกสนามแบดมินตัน --</option>
+            </select>
+
+            <div class="glass-card" onclick="openCloudRankModal()">
+                <h3>🏆 ทำเนียบแชมป์ 3D Podium</h3>
+                <p>แตะเพื่อดูอันดับสูงสุดและสถิติเซตของเพื่อนในก๊วน</p>
+            </div>
+
+            <div class="glass-grid">
+                <div class="glass-menu-item" onclick="openLocalRankModal()"><span class="icon">📊</span><span>แรงค์ก๊วน</span></div>
+                <div class="glass-menu-item" onclick="openModal()"><span class="icon">👥</span><span>สุ่มคิว</span></div>
+                <div class="glass-menu-item" onclick="openCourtMapModal()"><span class="icon">📍</span><span>สนามแบด</span></div>
+                <div class="glass-menu-item" onclick="openCostCalcModal()"><span class="icon">💰</span><span>คำนวณเงิน</span></div>
+            </div>
+
+            <button class="glass-btn-primary" onclick="startApp()">▶ เริ่มต้นใช้งานสนาม</button>
+        </div>
+    </div>
+
     <div class="top-right-btns">
-        <div class="floating-btn" onclick="openLocalRankModal()" title="แรงค์ก๊วนเราเอง">📊</div>
-        <div class="floating-btn" onclick="openCloudRankModal()" title="ทำเนียบแชมป์โลก (Cloud)">🏆</div>
+        <div class="floating-btn" onclick="openHome()" title="กลับหน้าแรก">🏠</div>
+        <div class="floating-btn" onclick="openLocalRankModal()" title="แรงค์ก๊วน">📊</div>
+        <div class="floating-btn" onclick="openCostCalcModal()" title="คำนวณเงิน">💰</div>
+        <div class="floating-btn" onclick="openCloudRankModal()" title="ทำเนียบแชมป์">🏆</div>
     </div>
 
     <div class="deuce-toast" id="deuceToast">DEUCE!</div>
@@ -301,171 +258,438 @@
         <input type="text" class="team-title-input" id="name1" value="TEAM A" onclick="event.stopPropagation()">
         <div class="set-badge" id="sets1">Win Sets: 0</div>
         <div class="score" id="score1">0</div>
-        <div class="btn-group">
-            <button class="score-btn minus-btn" onclick="event.stopPropagation(); updateScore(1, -1)">-</button>
-        </div>
+        <div class="btn-group"><button class="score-btn minus-btn" onclick="event.stopPropagation(); updateScore(1, -1)">-</button></div>
     </div>
 
     <div class="team-container team-2" id="container2" onclick="handleAreaClick(2)">
         <input type="text" class="team-title-input" id="name2" value="TEAM B" onclick="event.stopPropagation()">
         <div class="set-badge" id="sets2">Win Sets: 0</div>
         <div class="score" id="score2">0</div>
-        <div class="btn-group">
-            <button class="score-btn minus-btn" onclick="event.stopPropagation(); updateScore(2, -1)">-</button>
-        </div>
+        <div class="btn-group"><button class="score-btn minus-btn" onclick="event.stopPropagation(); updateScore(2, -1)">-</button></div>
     </div>
 
     <div class="control-dock" onclick="event.stopPropagation()">
+        <button class="dock-btn home-dock-btn" onclick="openHome()">🏠 หน้าแรก</button>
+        <button class="dock-btn calc-dock-btn" onclick="openCostCalcModal()">💰 คิดเงิน</button>
         <button class="dock-btn reset-dock-btn" onclick="resetMatch()">🔄 รีเซ็ต</button>
-        <button class="dock-btn queue-dock-btn" onclick="openModal()">👥 สุ่มจับคู่คิว</button>
+        <button class="dock-btn queue-dock-btn" onclick="openModal()">👥 คิว</button>
 
         <div class="color-picker-wrapper">
             <select class="settings-select" id="maxScoreSelect" onchange="changeMaxScore(this.value)">
-                <option value="7">🎯 7 แต้ม</option>
-                <option value="11">🎯 11 แต้ม</option>
-                <option value="15">🎯 15 แต้ม</option>
-                <option value="21" selected>🎯 21 แต้ม</option>
+                <option value="7">7แต้ม</option><option value="11">11แต้ม</option><option value="15">15แต้ม</option><option value="21" selected>21แต้ม</option>
             </select>
         </div>
-        <div class="color-picker-wrapper">
-            <span>ทีม1:</span><input type="color" class="color-input" value="#e3f2fd" oninput="changeTeamStyle(1, this.value)">
-        </div>
-        <div class="color-picker-wrapper">
-            <span>ทีม2:</span><input type="color" class="color-input" value="#fbe9e7" oninput="changeTeamStyle(2, this.value)">
-        </div>
+        <div class="color-picker-wrapper"><span>ทีม1:</span><input type="color" class="color-input" value="#e3f2fd" oninput="changeTeamStyle(1, this.value)"></div>
+        <div class="color-picker-wrapper"><span>ทีม2:</span><input type="color" class="color-input" value="#fbe9e7" oninput="changeTeamStyle(2, this.value)"></div>
     </div>
 
+    <!-- สุ่มคิว -->
     <div class="modal-overlay" id="randomModal" onclick="closeModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2>🎲 สุ่มจับคู่และจัดคิวแบดมินตัน</h2>
+            <p>เลือกโหมดและใส่รายชื่อเพื่อนเพื่อจัดคิวอัตโนมัติ</p>
             <select id="matchType">
                 <option value="1">เดี่ยว (1 vs 1) - ใช้ 2 คน</option>
                 <option value="2" selected>คู่ (2 vs 2) - ใช้ 4 คนขึ้นไป</option>
                 <option value="3">ทีมละ 3 คน (3 vs 3) - ใช้ 6 คนขึ้นไป</option>
             </select>
-            <div class="label-row">
-                <span>ประวัติรายชื่อเพื่อน (คลิกเพื่อเพิ่ม):</span>
-                <button class="clear-text-btn" onclick="clearAllHistory()">🗑️ ล้างประวัติ</button>
-            </div>
+            <div class="label-row-clean"><span>ประวัติรายชื่อเพื่อน:</span><button class="clear-btn-styled" onclick="clearAllHistory()">ล้าง</button></div>
             <div class="history-tags-container" id="historyTagsContainer"></div>
-            <div class="label-row" style="margin-top: 8px;">
-                <span>พิมพ์รายชื่อเพื่อน:</span>
-                <button class="clear-text-btn" onclick="clearPlayerInput()">🗑️ ล้างช่องพิมพ์</button>
-            </div>
-            <textarea id="playerNames" placeholder="พิมพ์รายชื่อเพื่อนทั้งหมด บรรทัดละ 1 คน"></textarea>
+            <div class="label-row-clean"><span>พิมพ์รายชื่อเพื่อน:</span><button class="clear-btn-styled" onclick="clearPlayerInput()">ล้างช่อง</button></div>
+            <textarea id="playerNames" placeholder="พิมพ์รายชื่อเพื่อน บรรทัดละ 1 คน" style="height: 70px;"></textarea>
             <div class="queue-status" id="queueStatusText">คิวที่รออยู่: ยังไม่มีข้อมูล</div>
             <div class="modal-btn-group">
                 <button class="modal-btn btn-cancel" onclick="closeModal()">ปิด</button>
-                <button class="modal-btn btn-confirm" onclick="setupQueueAndPlay()">สุ่มรายชื่อลงสนาม</button>
+                <button class="modal-btn btn-confirm" onclick="setupQueueAndPlay()">สุ่มลงสนาม</button>
             </div>
         </div>
     </div>
 
+    <!-- ตารางสรุปสถิติแบบละเอียด -->
     <div class="modal-overlay" id="localRankModal" onclick="closeLocalRankModal()">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <h2>📊 ตารางแรงค์ (เฉพาะก๊วนเรา)</h2>
-            <div class="leaderboard-list" id="localLeaderboardListContainer"></div>
-            <div class="modal-btn-group">
+        <div class="modal-card detailed-table-card" onclick="event.stopPropagation()">
+            <h2>สรุปผลก๊วนตีแบดอย่างละเอียด 🏸</h2>
+            <p style="color: #94a3b8; margin-bottom: 6px;">ตารางสถิติ ชนะ/แพ้ และสนามล่าสุดที่ไปตี</p>
+            
+            <div class="summary-table-container" id="localLeaderboardListContainer"></div>
+
+            <div class="modal-btn-group" style="margin-top: 14px;">
                 <button class="modal-btn btn-cancel" onclick="closeLocalRankModal()">ปิด</button>
-                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetLocalLeaderboard()">รีเซ็ตสถิติก๊วนเรา</button>
+                <button class="modal-btn btn-confirm" style="background-color: #ef4444;" onclick="resetLocalLeaderboard()">รีเซ็ตสถิติ</button>
             </div>
         </div>
     </div>
 
-    <!-- หน้าต่างทำเนียบแชมป์โลก -->
+    <!-- แผนที่ & ข้อมูลสนามพร้อมรูปรีวิวจริง -->
+    <div class="modal-overlay" id="courtMapModal" onclick="closeCourtMapModal()">
+        <div class="modal-card-split" onclick="event.stopPropagation()">
+            <h2>📍 แผนที่ค้นหาคอร์ทแบดมินตัน & รีวิวจากเจ้าของสนาม</h2>
+            <p>คลิกหมุดบนแผนที่เพื่อดูภาพถ่ายจริงของสถานที่</p>
+            <div class="split-layout">
+                <div class="split-left">
+                    <div class="map-box-wrapper">
+                        <div class="map-search-bar-floating" onclick="event.stopPropagation()">
+                            <span>🔍</span><input type="text" id="mapSearchInput" placeholder="ค้นหาสนาม..." onkeypress="handleMapSearchAPI(event)">
+                        </div>
+                        <div class="map-filter-chips" onclick="event.stopPropagation()">
+                            <div class="map-chip active" onclick="filterMapCategory('all')">🏸 ทั้งหมด</div>
+                            <div class="map-chip" onclick="filterMapCategory('indoor')">🏠 ในร่ม</div>
+                            <div class="map-chip" onclick="filterMapCategory('pro')">⭐ พรีเมียม</div>
+                        </div>
+                        <button class="reset-map-btn" onclick="resetMapOverviewAPI()">🔄 ดูภาพรวม</button>
+                        <div id="interactiveMap"></div>
+                    </div>
+                    <div style="font-size: 12px; font-weight: 700; color: #cbd5e1;">🏟️ รายชื่อสนามแนะนำในโคราช:</div>
+                    <div class="court-list-container-mini" id="courtListLeftContainer"></div>
+                </div>
+
+                <div class="split-right" id="courtDetailRightBox">
+                    <div>
+                        <img id="detailImg" src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=500&auto=format&fit=crop&q=60" alt="Court Photo" class="court-image-preview">
+                        <h3 id="detailTitle" style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px; font-family: 'Outfit', sans-serif;">สนามแบดมินตันมาตรฐาน</h3>
+                        <p id="detailDesc" style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">คลิกหมุดบนแผนที่เพื่อดูรูปถ่ายสถานที่จริงและนำทาง</p>
+                        <div id="detailPrice" style="font-size: 14px; font-weight: 800; color: #34d399; margin-bottom: 6px;"></div>
+                        <div id="detailPhone" style="font-size: 12px; color: #60a5fa; margin-bottom: 10px;"></div>
+                    </div>
+                    <div id="detailActionGroup" style="display: flex; gap: 8px;"><span style="font-size: 12px; color: #666;">ยังไม่ได้เลือกสนาม</span></div>
+                </div>
+            </div>
+            <div class="modal-btn-group"><button class="modal-btn btn-cancel" onclick="closeCourtMapModal()">ปิดหน้าต่าง</button></div>
+        </div>
+    </div>
+
+    <!-- เพิ่มสนามส่วนตัว -->
+    <div class="modal-overlay" id="addCustomCourtModal" onclick="closeAddCustomCourtModal()">
+        <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 450px;">
+            <h2>➕ เพิ่มสนามแบดส่วนตัว</h2>
+            <input type="text" id="newCourtName" placeholder="ชื่อสนาม">
+            <input type="text" id="newCourtDesc" placeholder="รายละเอียด เช่น พื้นยาง มีแอร์">
+            <input type="text" id="newCourtPrice" placeholder="ราคา เช่น 200 บาท/ชม.">
+            <input type="text" id="newCourtPhone" placeholder="เบอร์โทร">
+            <div class="modal-btn-group" style="margin-top: 14px;">
+                <button class="modal-btn btn-cancel" onclick="closeAddCustomCourtModal()">ยกเลิก</button>
+                <button class="modal-btn btn-confirm" onclick="saveNewCustomCourt()">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- คำนวณเงิน -->
+    <div class="modal-overlay" id="costCalcModal" onclick="closeCostCalcModal()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <h2>💰 คำนวณค่าสนาม & ลูกแบด</h2>
+            <div style="text-align: left; font-size: 12px; font-weight: 700; color: #cbd5e1;">ค่าบริการสนาม (บาท/ชม.):</div>
+            <input type="number" id="courtPricePerHour" value="200" oninput="calculateCourtCost()">
+            <div style="text-align: left; font-size: 12px; font-weight: 700; color: #cbd5e1;">จำนวนชั่วโมง:</div>
+            <input type="number" id="bookingHours" value="2" oninput="calculateCourtCost()">
+            <div style="text-align: left; font-size: 12px; font-weight: 700; color: #cbd5e1;">จำนวนลูกแบด (ลูก):</div>
+            <input type="number" id="totalShuttlesUsed" value="3" oninput="calculateCourtCost()">
+            <div style="text-align: left; font-size: 12px; font-weight: 700; color: #cbd5e1;">ราคาลูกแบดต่อลูก:</div>
+            <input type="number" id="shuttlePricePerPiece" value="25" oninput="calculateCourtCost()">
+            <div style="text-align: left; font-size: 12px; font-weight: 700; color: #cbd5e1;">จำนวนคนหาร:</div>
+            <input type="number" id="totalPlayersCount" value="4" oninput="calculateCourtCost()">
+            <div id="calcResultBox" style="background: rgba(16, 185, 129, 0.1); border: 1.5px solid rgba(16, 185, 129, 0.3); padding: 14px; border-radius: 16px; font-size: 13px; color: #34d399; text-align: center; font-weight: 600; margin-bottom: 15px;"></div>
+            <div class="modal-btn-group"><button class="modal-btn btn-cancel" onclick="closeCostCalcModal()">ปิด</button></div>
+        </div>
+    </div>
+
+    <!-- ทำเนียบแชมป์โลก 3D Podium พร้อมระบบสำรองรูปภาพ -->
     <div class="modal-overlay" id="cloudRankModal" onclick="closeCloudRankModal()">
         <div class="modal-card cloud-modal-card" onclick="event.stopPropagation()">
             <h2>🏆 ทำเนียบแชมป์โลก (Podium)</h2>
-            <p style="font-size: 11px; color: #888; margin-bottom: 5px;">สถิติสูงสุดจากระบบกลาง</p>
+            <p style="color: #94a3b8 !important; margin-bottom: 10px;">สถิติสูงสุดจากระบบกลาง</p>
             
             <div class="image-podium-wrapper" id="imagePodiumContainer">
-                <!-- โหลดรูปโพเดียมจาก Discord -->
+                <img id="podiumRealImg" src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80" alt="Podium">
             </div>
 
-            <div class="leaderboard-list" id="cloudLeaderboardListContainer"></div>
+            <div class="leaderboard-list-box" id="cloudLeaderboardListContainer"></div>
 
-            <div class="modal-btn-group">
+            <div class="modal-btn-group" style="margin-top: 14px;">
                 <button class="modal-btn btn-cancel" onclick="closeCloudRankModal()">ปิด</button>
-                <button class="modal-btn btn-confirm" style="background-color: #ff3b30;" onclick="resetCloudLeaderboardSecure()">รีเซ็ตคลาวด์กลาง</button>
+                <button class="modal-btn btn-confirm" style="background-color: #ef4444;" onclick="resetCloudLeaderboardSecure()">รีเซ็ตคลาวด์</button>
             </div>
         </div>
     </div>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initInteractiveMap"></script>
 
     <script>
         let score1 = 0, score2 = 0, sets1 = 0, sets2 = 0, maxScore = 21, absoluteMaxScore = 30;
         let waitingQueue = [], activePlayersTeam1 = [], activePlayersTeam2 = [], currentMatchType = 2;
         let savedPlayerHistory = JSON.parse(localStorage.getItem('badminton_history') || '[]');
         let playerWins = JSON.parse(localStorage.getItem('badminton_wins') || '{}');
+        let playerLosses = JSON.parse(localStorage.getItem('badminton_losses') || '{}');
+        let playerMatchHistory = JSON.parse(localStorage.getItem('badminton_match_history') || '{}');
+        let playerLastCourt = JSON.parse(localStorage.getItem('badminton_player_court') || '{}');
+        let currentMatchCourt = localStorage.getItem('badminton_current_court') || 'ยังไม่ได้ระบุสนาม';
         let lastDeuceState = false;
+        let selectedCourtIndex = null;
         const ADMIN_PIN = "1234";
+
+        /* --- ฟังก์ชันอัปเดตนาฬิกาเรียลไทม์ --- */
+        function updateLiveClock() {
+            let now = new Date();
+            let hours = String(now.getHours()).padStart(2, '0');
+            let minutes = String(now.getMinutes()).padStart(2, '0');
+            let seconds = String(now.getSeconds()).padStart(2, '0');
+            let timeString = `${hours}:${minutes}:${seconds}`;
+
+            let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            let dateString = now.toLocaleDateString('th-TH', options);
+
+            let timeEl = document.getElementById('liveTimeText');
+            let dateEl = document.getElementById('liveDateText');
+            if(timeEl) timeEl.innerText = timeString;
+            if(dateEl) dateEl.innerText = dateString;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        /* --- ฟังก์ชันเปลี่ยนสีทีม (Team Color Picker) สมบูรณ์แบบ --- */
+        function changeTeamStyle(teamNum, color) {
+            let container = document.getElementById(`container${teamNum}`);
+            if (container) {
+                container.style.backgroundColor = color;
+                let rgb = hexToRgb(color);
+                if (rgb) {
+                    let brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+                    container.style.color = brightness < 125 ? '#ffffff' : '#222222';
+                }
+            }
+        }
+
+        function hexToRgb(hex) {
+            let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+        }
+
+        /* --- พิกัดแม่นยำไม่ทับซ้อนกันในโคราช พร้อมรูปถ่ายสถานที่จริง --- */
+        let defaultCourts = [
+            { name: "สนามแบดมินตัน ราชานุกูลสุรนารี", desc: "สนามมาตรฐาน • เปิดทุกวัน 09:00 - 22:00", price: "200 บาท/ชม.", phone: "044-251234", lat: 14.9820, lng: 102.1050, category: "indoor", img: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=500&auto=format&fit=crop&q=60" },
+            { name: "สุรนารีแบดมินตัน", desc: "คอร์ทในร่ม กว้างขวาง มีที่จอดรถสะดวก", price: "250 บาท/ชม.", phone: "044-245678", lat: 14.9950, lng: 102.0820, category: "indoor", img: "https://images.unsplash.com/photo-1599586122415-3453a479ff70?w=500&auto=format&fit=crop&q=60" },
+            { name: "S19 Badminton Club", desc: "สนามพรีเมียม พื้นยางแข่งขันระดับสากล", price: "300 บาท/ชม.", phone: "044-353888", lat: 14.9600, lng: 102.1350, category: "pro", img: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=500&auto=format&fit=crop&q=60" },
+            { name: "VS Badminton", desc: "สนามยอดนิยม กว้างขวาง เดินทางสะดวก", price: "220 บาท/ชม.", phone: "044-234567", lat: 14.9450, lng: 102.0680, category: "indoor", img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&auto=format&fit=crop&q=60" },
+            { name: "สีมาแบดมินตัน", desc: "สนามเก่าแก่ได้มาตรฐาน บรรยากาศเป็นกันเอง", price: "180 บาท/ชม.", phone: "044-212345", lat: 14.9320, lng: 102.0550, category: "indoor", img: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=500&auto=format&fit=crop&q=60" },
+            { name: "สนามแบดมินตัน มทร.อีสาน", desc: "สนามในร่ม ตั้งอยู่ภายในมหาวิทยาลัย", price: "200 บาท/ชม.", phone: "044-233000", lat: 15.0100, lng: 102.1200, category: "indoor", img: "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=500&auto=format&fit=crop&q=60" },
+            { name: "เดอะ พีค คลับ โคราช", desc: "คลับแบดมินตันพรีเมียม สิ่งอำนวยความสะดวกครบครัน", price: "350 บาท/ชม.", phone: "044-467890", lat: 14.9900, lng: 102.1300, category: "pro", img: "https://images.unsplash.com/photo-1569517282132-25d22f29236e?w=500&auto=format&fit=crop&q=60" }
+        ];
+        let customCourts = JSON.parse(localStorage.getItem('badminton_custom_courts') || '[]');
+        let allCourts = [...defaultCourts, ...customCourts];
+
+        function initActiveMatchCourtDropdown() {
+            let select = document.getElementById('activeMatchCourtSelect');
+            if (!select) return;
+            let html = `<option value="ยังไม่ได้ระบุสนาม">-- เลือกสนามแบดมินตัน --</option>`;
+            allCourts.forEach(c => {
+                let selected = (c.name === currentMatchCourt) ? 'selected' : '';
+                html += `<option value="${c.name}" ${selected}>🏟️ ${c.name}</option>`;
+            });
+            select.innerHTML = html;
+        }
+        window.addEventListener('DOMContentLoaded', initActiveMatchCourtDropdown);
+
+        function updateActiveMatchCourt(courtName) {
+            currentMatchCourt = courtName;
+            localStorage.setItem('badminton_current_court', courtName);
+        }
+
+        let map = null;
+        let markers = [];
+        let placesService = null;
+
+        function initInteractiveMap() {
+            let koratCenter = { lat: 14.9799, lng: 102.1025 };
+            map = new google.maps.Map(document.getElementById("interactiveMap"), {
+                center: koratCenter, zoom: 12,
+                styles: [
+                    { elementType: "geometry", stylers: [{ color: "#1d2c4d" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#304a7d" }] },
+                    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0e1626" }] }
+                ]
+            });
+            placesService = new google.maps.places.PlacesService(map);
+            renderMapMarkers(allCourts);
+        }
+
+        function renderMapMarkers(courtsToRender) {
+            markers.forEach(m => m.setMap(null));
+            markers = [];
+            courtsToRender.forEach((court, index) => {
+                let svgPin = {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="16" fill="#2563eb" stroke="#ffffff" stroke-width="3" />
+                            <text x="18" y="23" font-size="16" text-anchor="middle">🏸</text>
+                        </svg>
+                    `),
+                    scaledSize: new google.maps.Size(34, 34),
+                    anchor: new google.maps.Point(17, 17)
+                };
+                let marker = new google.maps.Marker({
+                    position: { lat: court.lat, lng: court.lng },
+                    map: map, title: court.name, icon: svgPin,
+                    label: { text: court.name, color: "#ffffff", fontSize: "11px", fontWeight: "700" }
+                });
+                marker.addListener("click", () => { selectCourtDetail(index); map.panTo(marker.getPosition()); map.setZoom(15); });
+                markers.push(marker);
+            });
+        }
+
+        function startApp() {
+            let home = document.getElementById('homeScreen');
+            home.style.opacity = '0'; home.style.transform = 'scale(0.95)';
+            setTimeout(() => { home.style.display = 'none'; }, 300);
+        }
+        function openHome() { let home = document.getElementById('homeScreen'); home.style.display = 'flex'; home.style.opacity = '1'; home.style.transform = 'scale(1)'; }
+
+        function openCourtMapModal() { document.getElementById('courtMapModal').style.display = 'flex'; renderCourtListLeft(); if(map) { google.maps.event.trigger(map, "resize"); resetMapOverviewAPI(); } }
+        function closeCourtMapModal() { document.getElementById('courtMapModal').style.display = 'none'; }
+        function openAddCustomCourtModal() { document.getElementById('addCustomCourtModal').style.display = 'flex'; }
+        function closeAddCustomCourtModal() { document.getElementById('addCustomCourtModal').style.display = 'none'; }
+
+        function resetMapOverviewAPI() {
+            selectedCourtIndex = null;
+            document.querySelectorAll('.court-list-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById('mapSearchInput').value = "";
+            if(map) { map.setCenter({ lat: 14.9799, lng: 102.1025 }); map.setZoom(12); }
+            renderMapMarkers(allCourts);
+            document.getElementById('detailTitle').innerText = "ภาพรวมสนามแบดมินตันรอบตัว";
+            document.getElementById('detailDesc').innerText = "คลิกหมุดบนแผนที่เพื่อดูรูปถ่ายสถานที่จริง";
+            document.getElementById('detailImg').src = "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=500&auto=format&fit=crop&q=60";
+            document.getElementById('detailPrice').innerText = ""; document.getElementById('detailPhone').innerText = "";
+            document.getElementById('detailActionGroup').innerHTML = `<span style="font-size: 12px; color: #666;">ยังไม่ได้เลือกสนาม</span>`;
+        }
+
+        function filterMapCategory(category) {
+            selectedCourtIndex = null;
+            document.querySelectorAll('.map-chip').forEach(chip => chip.classList.remove('active'));
+            event.target.classList.add('active');
+            let filtered = category === 'all' ? allCourts : allCourts.filter(c => c.category === category);
+            renderMapMarkers(filtered);
+            if (filtered.length > 0 && map) { map.setCenter({ lat: filtered[0].lat, lng: filtered[0].lng }); map.setZoom(12); }
+        }
+
+        function handleMapSearchAPI(e) {
+            if (e.key === 'Enter') {
+                let val = document.getElementById('mapSearchInput').value.trim();
+                if (!val) return;
+                let foundIndex = allCourts.findIndex(c => c.name.toLowerCase().includes(val.toLowerCase()));
+                if (foundIndex !== -1) { selectCourtDetail(foundIndex); map.setCenter(markers[foundIndex].getPosition()); map.setZoom(15); }
+                else if (placesService) {
+                    placesService.textSearch({ query: val, location: map.getCenter(), radius: 10000 }, (results, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0]) {
+                            let place = results[0];
+                            let newCourt = { name: place.name, desc: place.formatted_address || 'จาก Google Maps', price: 'ตามตกลง', phone: place.international_phone_number || '-', lat: place.geometry.location.lat(), lng: place.geometry.location.lng(), category: 'indoor', img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&auto=format&fit=crop&q=60" };
+                            allCourts.push(newCourt); renderMapMarkers(allCourts); renderCourtListLeft(); selectCourtDetail(allCourts.length - 1); initActiveMatchCourtDropdown();
+                        } else alert('ไม่พบสถานที่');
+                    });
+                }
+            }
+        }
+
+        function saveNewCustomCourt() {
+            let name = document.getElementById('newCourtName').value.trim();
+            if (!name) { alert('ใส่ชื่อสนามด้วยครับ'); return; }
+            let newCourt = { name, desc: document.getElementById('newCourtDesc').value.trim() || 'สนามส่วนตัว', price: document.getElementById('newCourtPrice').value.trim() || 'ตามตกลง', phone: document.getElementById('newCourtPhone').value.trim() || '-', lat: 14.9799 + (Math.random()-0.5)*0.03, lng: 102.1025 + (Math.random()-0.5)*0.03, category: "indoor", img: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=500&auto=format&fit=crop&q=60" };
+            customCourts.push(newCourt); localStorage.setItem('badminton_custom_courts', JSON.stringify(customCourts));
+            allCourts = [...defaultCourts, ...customCourts]; closeAddCustomCourtModal(); renderCourtListLeft(); renderMapMarkers(allCourts); selectCourtDetail(allCourts.length - 1); initActiveMatchCourtDropdown();
+        }
+
+        function renderCourtListLeft() {
+            let html = '';
+            allCourts.forEach((court, index) => {
+                html += `<div class="court-list-item" id="courtItem-${index}" onclick="selectCourtDetail(${index})"><div><h4>🏸 ${court.name}</h4><p>${court.desc}</p></div><div style="font-size: 11px; font-weight: 700; color: #34d399;">${court.price}</div></div>`;
+            });
+            html += `<div class="add-custom-court-box" onclick="openAddCustomCourtModal()">➕ เพิ่มสนามส่วนตัว</div>`;
+            document.getElementById('courtListLeftContainer').innerHTML = html;
+        }
+
+        function selectCourtDetail(index) {
+            selectedCourtIndex = index;
+            document.querySelectorAll('.court-list-item').forEach(el => el.classList.remove('selected'));
+            let sel = document.getElementById(`courtItem-${index}`); if(sel) sel.classList.add('selected');
+            let court = allCourts[index];
+            document.getElementById('mapSearchInput').value = court.name;
+            if(map && markers[index]) { map.setCenter(markers[index].getPosition()); map.setZoom(15); }
+            document.getElementById('detailTitle').innerText = court.name;
+            document.getElementById('detailDesc').innerText = court.desc;
+            document.getElementById('detailImg').src = court.img;
+            document.getElementById('detailPrice').innerText = `💰 ค่าบริการ: ${court.price}`;
+            document.getElementById('detailPhone').innerText = `📞 โทรจอง: ${court.phone}`;
+            document.getElementById('detailActionGroup').innerHTML = `
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name)}" target="_blank" class="modal-btn btn-confirm">🧭 นำทาง Google Maps</a>
+                <button class="modal-btn" style="background:#2563eb; color:#fff;" onclick="setAsCurrentCourtFromMap('${court.name}')">🏟️ เลือกตีสนามนี้</button>
+            `;
+        }
+
+        function setAsCurrentCourtFromMap(courtName) {
+            currentMatchCourt = courtName;
+            localStorage.setItem('badminton_current_court', courtName);
+            let select = document.getElementById('activeMatchCourtSelect');
+            if(select) select.value = courtName;
+            alert(`✅ ตั้งค่าสนามปัจจุบันเป็น: ${courtName} เรียบร้อย!`);
+            closeCourtMapModal();
+        }
+
+        function openCostCalcModal() { document.getElementById('costCalcModal').style.display = 'flex'; calculateCourtCost(); }
+        function closeCostCalcModal() { document.getElementById('costCalcModal').style.display = 'none'; }
+        function calculateCourtCost() {
+            let total = (parseFloat(document.getElementById('courtPricePerHour').value||0) * parseFloat(document.getElementById('bookingHours').value||0)) + (parseFloat(document.getElementById('totalShuttlesUsed').value||0) * parseFloat(document.getElementById('shuttlePricePerPiece').value||0));
+            let per = total / (parseInt(document.getElementById('totalPlayersCount').value)||1);
+            document.getElementById('calcResultBox').innerHTML = `ยอดรวม: <b>${total.toLocaleString()} บาท</b><br><span style="color:#34d399; font-size:14px; font-weight:800;">👉 หารแล้วจ่ายคนละ ${per.toFixed(2)} บาท</span>`;
+        }
 
         function saveToLocal() {
             localStorage.setItem('badminton_history', JSON.stringify(savedPlayerHistory));
             localStorage.setItem('badminton_wins', JSON.stringify(playerWins));
+            localStorage.setItem('badminton_losses', JSON.stringify(playerLosses));
+            localStorage.setItem('badminton_match_history', JSON.stringify(playerMatchHistory));
+            localStorage.setItem('badminton_player_court', JSON.stringify(playerLastCourt));
         }
 
         function openModal() { document.getElementById('randomModal').style.display = 'flex'; renderHistoryTags(); updateQueueStatusUI(); }
         function closeModal() { document.getElementById('randomModal').style.display = 'none'; }
-        function openLocalRankModal() { document.getElementById('localRankModal').style.display = 'flex'; renderLocalLeaderboard(); }
+        function openLocalRankModal() { document.getElementById('localRankModal').style.display = 'flex'; renderDetailedSummaryTable(); }
         function closeLocalRankModal() { document.getElementById('localRankModal').style.display = 'none'; }
         
-        function openCloudRankModal() {
-            document.getElementById('cloudRankModal').style.display = 'flex';
-            if (typeof fetchCloudLeaderboard === 'function') fetchCloudLeaderboard();
-        }
-        function closeCloudRankModal() {
-            document.getElementById('cloudRankModal').style.display = 'none';
-        }
+        function openCloudRankModal() { document.getElementById('cloudRankModal').style.display = 'flex'; fetchCloudLeaderboard(); }
+        function closeCloudRankModal() { document.getElementById('cloudRankModal').style.display = 'none'; }
 
         function showDeuceToast() {
-            let toast = document.getElementById('deuceToast');
-            toast.classList.add('show');
+            let toast = document.getElementById('deuceToast'); toast.classList.add('show');
             setTimeout(() => { toast.classList.remove('show'); }, 2000);
         }
 
-        function clearPlayerInput() { document.getElementById('playerNames').value = ''; document.getElementById('playerNames').focus(); }
+        function clearPlayerInput() { document.getElementById('playerNames').value = ''; }
         function appendPlayerName(name) {
-            let textarea = document.getElementById('playerNames');
-            let currentText = textarea.value.trim();
-            if (currentText === "") textarea.value = name;
-            else {
-                let lines = currentText.split('\n').map(p => p.trim());
-                if (!lines.includes(name)) textarea.value = currentText + '\n' + name;
-            }
+            let ta = document.getElementById('playerNames');
+            ta.value = ta.value.trim() ? ta.value + '\n' + name : name;
         }
 
         function handleAreaClick(team) { updateScore(team, 1); }
         function updateScore(team, value) {
-            if (team === 1) { score1 += value; if (score1 < 0) score1 = 0; document.getElementById('score1').innerText = score1; }
-            else if (team === 2) { score2 += value; if (score2 < 0) score2 = 0; document.getElementById('score2').innerText = score2; }
+            if (team === 1) { score1 = Math.max(0, score1 + value); document.getElementById('score1').innerText = score1; }
+            else { score2 = Math.max(0, score2 + value); document.getElementById('score2').innerText = score2; }
             checkDeuce(); checkWin();
         }
 
         function checkDeuce() {
             let deuceThreshold = maxScore - 1;
-            let isCurrentlyDeuce = (score1 >= deuceThreshold && score2 >= deuceThreshold && score1 === score2);
-            if (isCurrentlyDeuce && !lastDeuceState) showDeuceToast();
-            lastDeuceState = isCurrentlyDeuce;
+            let isDeuce = (score1 >= deuceThreshold && score2 >= deuceThreshold && score1 === score2);
+            if (isDeuce && !lastDeuceState) showDeuceToast();
+            lastDeuceState = isDeuce;
         }
 
         function changeMaxScore(val) {
             maxScore = parseInt(val);
-            if (maxScore === 7) absoluteMaxScore = 9;
-            else if (maxScore === 11) absoluteMaxScore = 15;
-            else if (maxScore === 15) absoluteMaxScore = 21;
-            else absoluteMaxScore = 30;
+            absoluteMaxScore = maxScore === 7 ? 9 : (maxScore === 11 ? 15 : (maxScore === 15 ? 21 : 30));
             resetScore();
         }
-
-        function resetScore() { score1 = 0; score2 = 0; lastDeuceState = false; document.getElementById('score1').innerText = score1; document.getElementById('score2').innerText = score2; }
-        function resetMatch() {
-            if (confirm('ต้องการรีเซ็ตคะแนนและจำนวนเซตทั้งหมดหรือไม่?')) {
-                sets1 = 0; sets2 = 0;
-                document.getElementById('sets1').innerText = "Win Sets: 0";
-                document.getElementById('sets2').innerText = "Win Sets: 0";
-                resetScore();
-            }
-        }
+        function resetScore() { score1 = 0; score2 = 0; lastDeuceState = false; document.getElementById('score1').innerText = 0; document.getElementById('score2').innerText = 0; }
+        function resetMatch() { if (confirm('รีเซ็ตคะแนนและเซตทั้งหมด?')) { sets1 = 0; sets2 = 0; document.getElementById('sets1').innerText = "Win Sets: 0"; document.getElementById('sets2').innerText = "Win Sets: 0"; resetScore(); } }
 
         function updateTeamNamesUI() {
             if (activePlayersTeam1.length > 0) {
@@ -475,124 +699,143 @@
         }
 
         function rotateQueue(loserTeam) {
-            if (waitingQueue.length === 0) { alert('⚠️ ไม่มีเพื่อนรอคิวอยู่แล้วครับ!'); return; }
-            let outgoingPlayers = loserTeam === 1 ? activePlayersTeam1 : activePlayersTeam2;
-            waitingQueue.push(...outgoingPlayers);
+            if (waitingQueue.length === 0) { alert('⚠️ ไม่มีเพื่อนรอคิว!'); return; }
+            let outgoing = loserTeam === 1 ? activePlayersTeam1 : activePlayersTeam2;
+            waitingQueue.push(...outgoing);
             let incomingCount = currentMatchType === 1 ? 1 : (currentMatchType === 2 ? 2 : 3);
             let newPlayers = waitingQueue.splice(0, incomingCount);
             if (loserTeam === 1) activePlayersTeam1 = newPlayers; else activePlayersTeam2 = newPlayers;
             updateTeamNamesUI(); resetScore(); alert('🔄 หมุนเวียนคิวเรียบร้อย!');
         }
 
-        function changeTeamStyle(team, color) {
-            const container = document.getElementById(team === 1 ? 'container1' : 'container2');
-            container.style.backgroundColor = color;
-            const r = parseInt(color.substr(1, 2), 16), g = parseInt(color.substr(3, 2), 16), b = parseInt(color.substr(5, 2), 16);
-            container.style.color = ((r * 299 + g * 587 + b * 114) / 1000) < 128 ? '#ffffff' : '#111111';
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                let j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
         function setupQueueAndPlay() {
             let rawText = document.getElementById('playerNames').value.trim();
             let players = rawText.split('\n').map(p => p.trim()).filter(p => p.length > 0);
             currentMatchType = parseInt(document.getElementById('matchType').value);
-            let requiredCount = currentMatchType === 1 ? 2 : (currentMatchType === 2 ? 4 : 6);
-            if (players.length < requiredCount) { alert(`โหมดนี้ต้องใช้ผู้เล่นอย่างน้อย ${requiredCount} คนครับ!`); return; }
+            let req = currentMatchType === 1 ? 2 : (currentMatchType === 2 ? 4 : 6);
+            if (players.length < req) { alert(`ต้องใช้ผู้เล่นอย่างน้อย ${req} คน`); return; }
 
             players.forEach(name => {
                 if (!savedPlayerHistory.includes(name)) savedPlayerHistory.push(name);
                 if (!(name in playerWins)) playerWins[name] = 0;
+                if (!(name in playerLosses)) playerLosses[name] = 0;
+                if (!(name in playerMatchHistory)) playerMatchHistory[name] = [];
+                playerLastCourt[name] = currentMatchCourt;
             });
             saveToLocal();
 
-            let shuffledPlayers = shuffleArray([...players]);
-            let activePool = shuffledPlayers.splice(0, requiredCount);
-            waitingQueue = shuffledPlayers;
+            let shuffled = [...players].sort(() => Math.random() - 0.5);
+            let pool = shuffled.splice(0, req);
+            waitingQueue = shuffled;
 
-            if (currentMatchType === 2) {
-                activePlayersTeam1 = [activePool[0], activePool[1]];
-                activePlayersTeam2 = [activePool[2], activePool[3]];
-            } else if (currentMatchType === 3) {
-                activePlayersTeam1 = [activePool[0], activePool[1], activePool[2]];
-                activePlayersTeam2 = [activePool[3], activePool[4], activePool[5]];
-            } else {
-                activePlayersTeam1 = [activePool[0]];
-                activePlayersTeam2 = [activePool[1]];
-            }
+            if (currentMatchType === 2) { activePlayersTeam1 = [pool[0], pool[1]]; activePlayersTeam2 = [pool[2], pool[3]]; }
+            else if (currentMatchType === 3) { activePlayersTeam1 = [pool[0], pool[1], pool[2]]; activePlayersTeam2 = [pool[3], pool[4], pool[5]]; }
+            else { activePlayersTeam1 = [pool[0]]; activePlayersTeam2 = [pool[1]]; }
 
-            updateTeamNamesUI(); closeModal(); resetMatch(); updateQueueStatusUI(); alert('🎲 สุ่มจับคู่รายชื่อลงสนามเรียบร้อย!');
+            updateTeamNamesUI(); closeModal(); resetMatch(); updateQueueStatusUI(); alert('🎲 สุ่มลงสนามสำเร็จ!');
         }
 
         function checkWin() {
             let diff = Math.abs(score1 - score2);
             let hasWon = (score1 >= maxScore || score2 >= maxScore) && (diff >= 2 || score1 >= absoluteMaxScore || score2 >= absoluteMaxScore);
-
             if (hasWon) {
-                let team1Name = document.getElementById('name1').value;
-                let team2Name = document.getElementById('name2').value;
+                let allActive = [...activePlayersTeam1, ...activePlayersTeam2];
+                allActive.forEach(p => { playerLastCourt[p] = currentMatchCourt; });
+
                 if (score1 > score2) {
                     sets1++; document.getElementById('sets1').innerText = "Win Sets: " + sets1;
-                    activePlayersTeam1.forEach(p => { playerWins[p] = (playerWins[p] || 0) + 1; if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p); });
+                    activePlayersTeam1.forEach(p => { 
+                        playerWins[p] = (playerWins[p] || 0) + 1; 
+                        if(!playerMatchHistory[p]) playerMatchHistory[p] = [];
+                        playerMatchHistory[p].push('W');
+                        if(!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p); 
+                    });
+                    activePlayersTeam2.forEach(p => { 
+                        playerLosses[p] = (playerLosses[p] || 0) + 1; 
+                        if(!playerMatchHistory[p]) playerMatchHistory[p] = [];
+                        playerMatchHistory[p].push('L');
+                    });
                     saveToLocal(); if (typeof autoSyncToCloud === 'function') autoSyncToCloud();
-                    if (confirm(`🎉 ทีม (${team1Name}) ชนะ!\n\nให้ทีมแพ้ (${team2Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) rotateQueue(2); else resetScore();
+                    if (confirm(`🎉 ทีม 1 ชนะ! ให้ทีม 2 พักแล้วดึงคิวถัดไป?`)) rotateQueue(2); else resetScore();
                 } else {
                     sets2++; document.getElementById('sets2').innerText = "Win Sets: " + sets2;
-                    activePlayersTeam2.forEach(p => { playerWins[p] = (playerWins[p] || 0) + 1; if (!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p); });
+                    activePlayersTeam2.forEach(p => { 
+                        playerWins[p] = (playerWins[p] || 0) + 1; 
+                        if(!playerMatchHistory[p]) playerMatchHistory[p] = [];
+                        playerMatchHistory[p].push('W');
+                        if(!savedPlayerHistory.includes(p)) savedPlayerHistory.push(p); 
+                    });
+                    activePlayersTeam1.forEach(p => { 
+                        playerLosses[p] = (playerLosses[p] || 0) + 1; 
+                        if(!playerMatchHistory[p]) playerMatchHistory[p] = [];
+                        playerMatchHistory[p].push('L');
+                    });
                     saveToLocal(); if (typeof autoSyncToCloud === 'function') autoSyncToCloud();
-                    if (confirm(`🎉 ทีม (${team2Name}) ชนะ!\n\nให้ทีมแพ้ (${team1Name}) ลงพักแล้วดึงคิวถัดไปขึ้นมาแทนเลยไหม?`)) rotateQueue(1); else resetScore();
+                    if (confirm(`🎉 ทีม 2 ชนะ! ให้ทีม 1 พักแล้วดึงคิวถัดไป?`)) rotateQueue(1); else resetScore();
                 }
             }
         }
 
-        function renderLocalLeaderboard() {
+        /* --- ตารางสรุปสถิติแบบสี่เหลี่ยมเรียงยาว พร้อมโชว์สนามล่าสุด --- */
+        function renderDetailedSummaryTable() {
             let container = document.getElementById('localLeaderboardListContainer');
             if (!container) return;
-            let sortedPlayers = [...savedPlayerHistory].sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
-            if (sortedPlayers.length === 0 || sortedPlayers.every(p => (playerWins[p] || 0) === 0)) {
-                container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px; font-size: 13px;">ยังไม่มีสถิติการชนะในก๊วนเรา</div>';
-                return;
-            }
+            let sorted = [...savedPlayerHistory].sort((a, b) => (playerWins[b] || 0) - (playerWins[a] || 0));
+            if (sorted.length === 0) { container.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">ยังไม่มีข้อมูลการเล่นในก๊วน</div>'; return; }
+
             let html = '';
-            sortedPlayers.forEach((name, index) => {
-                let wins = playerWins[name] || 0;
-                let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `#${index + 1}`));
-                html += `<div class="leaderboard-item"><span class="leaderboard-rank">${rankIcon}</span><span class="leaderboard-name">${name}</span><span class="leaderboard-score">ชนะ ${wins} เซต</span></div>`;
+            sorted.forEach((name, index) => {
+                let wins = playerWins[name] || 0, losses = playerLosses[name] || 0, total = wins + losses;
+                let winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
+                let history = playerMatchHistory[name] || [];
+                let lastCourt = playerLastCourt[name] || currentMatchCourt || 'ยังไม่ได้ระบุสนาม';
+                let rankNum = index + 1;
+                let rankClass = index === 0 ? 'rank-1' : (index === 1 ? 'rank-2' : (index === 2 ? 'rank-3' : ''));
+
+                let historyBoxesHtml = '';
+                if (history.length > 0) {
+                    historyBoxesHtml = history.map(res => `<div class="match-box-item ${res === 'W' ? 'box-win' : 'box-lose'}">${res}</div>`).join('');
+                } else {
+                    historyBoxesHtml = `<span style="font-size: 10px; color: #888;">ยังไม่มีประวัติ</span>`;
+                }
+
+                html += `
+                    <div class="summary-row ${rankClass}">
+                        <div class="sum-left">
+                            <div class="sum-rank">${rankNum}</div>
+                            <div class="sum-user-info">
+                                <div class="sum-username"><b>${name}</b></div>
+                                <div class="sum-court-tag">🏟️ ล่าสุด: ${lastCourt}</div>
+                                <div class="history-boxes-row">${historyBoxesHtml}</div>
+                            </div>
+                        </div>
+                        <div class="sum-stats-right">
+                            <div class="sum-nums">ชนะ ${wins}<br>แพ้ ${losses}</div>
+                            <div class="sum-winrate">${winRate}%</div>
+                        </div>
+                    </div>
+                `;
             });
             container.innerHTML = html;
         }
 
         function resetLocalLeaderboard() {
-            if (confirm('ต้องการรีเซ็ตสถิติและคะแนนทั้งหมดของก๊วนเราใช่หรือไม่?')) {
-                playerWins = {}; savedPlayerHistory = []; saveToLocal(); renderLocalLeaderboard(); renderHistoryTags();
-            }
+            if (confirm('รีเซ็ตสถิติทั้งหมด?')) { playerWins = {}; playerLosses = {}; playerMatchHistory = {}; playerLastCourt = {}; savedPlayerHistory = []; saveToLocal(); renderDetailedSummaryTable(); renderHistoryTags(); }
         }
 
         function renderHistoryTags() {
             let container = document.getElementById('historyTagsContainer');
-            if (!container) return;
-            if (savedPlayerHistory.length === 0) { container.innerHTML = '<span style="font-size: 11px; color: #888; padding: 4px;">ยังไม่มีประวัติรายชื่อ</span>'; return; }
+            if (savedPlayerHistory.length === 0) { container.innerHTML = '<span style="font-size: 11px; color: #888;">ยังไม่มีประวัติ</span>'; return; }
             container.innerHTML = savedPlayerHistory.map(name => `<div class="history-tag" onclick="appendPlayerName('${name}')">+ ${name}</div>`).join('');
         }
-
         function updateQueueStatusUI() {
             let statusDiv = document.getElementById('queueStatusText');
-            if (!statusDiv) return;
-            statusDiv.innerHTML = waitingQueue.length === 0 ? "<b>คิวที่รออยู่:</b> ยังไม่มีรายชื่อในระบบ" : `<b>คิวรอลงสนาม (${waitingQueue.length} คน):</b> ${waitingQueue.join(', ')}`;
+            if (statusDiv) statusDiv.innerHTML = waitingQueue.length === 0 ? "<b>คิวรอ:</b> ยังไม่มี" : `<b>คิวรอลงสนาม (${waitingQueue.length} คน):</b> ${waitingQueue.join(', ')}`;
         }
-
-        function clearAllHistory() {
-            if (confirm('ต้องการล้างประวัติรายชื่อทั้งหมดหรือไม่?')) { savedPlayerHistory = []; playerWins = {}; saveToLocal(); renderHistoryTags(); }
-        }
+        function clearAllHistory() { if (confirm('ล้างประวัติทั้งหมด?')) { savedPlayerHistory = []; playerWins = {}; playerLosses = {}; playerMatchHistory = {}; playerLastCourt = {}; saveToLocal(); renderHistoryTags(); } }
     </script>
 
-    <!-- ระบบ Cloud Firestore กลาง -->
+    <!-- ระบบ Cloud Firestore กลาง พร้อมระบบสำรองรูปภาพ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -610,103 +853,89 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const rankDocRef = doc(db, "badminton_data", "leaderboard_room");
-
-        const discordImageUrl = "https://media.discordapp.net/attachments/1193954420044595220/1561103511016575016/podium.png.png?ex=6ad52270&is=6ad3d0f0&hm=33cecb6ad53ec505528e3e4047670eb9fcf73c63786ad98dd99fd5b020db7612&=&format=webp&quality=lossless&width=1024&height=1024";
+        
+        const primaryDiscordImg = "https://media.discordapp.net/attachments/1193954420044595220/1561103511016575016/podium.png.png?ex=6ad52270&is=6ad3d0f0&hm=33cecb6ad53ec505528e3e4047670eb9fcf73c63786ad98dd99fd5b020db7612&=&format=webp&quality=lossless&width=1024&height=1024";
+        const fallbackImg = "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80";
 
         window.fetchCloudLeaderboard = async function() {
             let containerWrapper = document.getElementById('imagePodiumContainer');
             let listContainer = document.getElementById('cloudLeaderboardListContainer');
             listContainer.innerHTML = '';
-
             try {
                 let docSnap = await getDoc(rankDocRef);
-                
-                let imageHtml = `<img src="${discordImageUrl}" alt="Podium">`;
-
+                let imageHtml = `<img src="${primaryDiscordImg}" alt="Podium" onerror="this.onerror=null; this.src='${fallbackImg}';">`;
+                let cloudWins = {}, cloudLosses = {}, cloudHistory = [], cloudCourts = {};
                 if (docSnap.exists()) {
                     let data = docSnap.data();
-                    let cloudWins = data.wins || {};
-                    let cloudHistory = data.history || [];
-                    let sortedPlayers = [...cloudHistory].sort((a, b) => (cloudWins[b] || 0) - (cloudWins[a] || 0));
-
-                    let top1 = sortedPlayers[0] ? { name: sortedPlayers[0], wins: cloudWins[sortedPlayers[0]] || 0 } : null;
-                    let top2 = sortedPlayers[1] ? { name: sortedPlayers[1], wins: cloudWins[sortedPlayers[1]] || 0 } : null;
-                    let top3 = sortedPlayers[2] ? { name: sortedPlayers[2], wins: cloudWins[sortedPlayers[2]] || 0 } : null;
-
-                    if (top1) {
-                        imageHtml += `
-                            <div class="overlay-card overlay-rank-1">
-                                <div class="overlay-name">👑 ${top1.name}</div>
-                                <div class="overlay-sets">ชนะ ${top1.wins} เซต</div>
-                            </div>
-                        `;
-                    }
-                    if (top2) {
-                        imageHtml += `
-                            <div class="overlay-card overlay-rank-2">
-                                <div class="overlay-name">🥈 ${top2.name}</div>
-                                <div class="overlay-sets">ชนะ ${top2.wins} เซต</div>
-                            </div>
-                        `;
-                    }
-                    if (top3) {
-                        imageHtml += `
-                            <div class="overlay-card overlay-rank-3">
-                                <div class="overlay-name">🥉 ${top3.name}</div>
-                                <div class="overlay-sets">ชนะ ${top3.wins} เซต</div>
-                            </div>
-                        `;
-                    }
-
-                    containerWrapper.innerHTML = imageHtml;
-
-                    let restPlayers = sortedPlayers.slice(3);
-                    if (restPlayers.length > 0) {
-                        let listHtml = '';
-                        restPlayers.forEach((name, index) => {
-                            let wins = cloudWins[name] || 0;
-                            listHtml += `<div class="leaderboard-item"><span class="leaderboard-rank">#${index + 4}</span><span class="leaderboard-name">${name}</span><span class="leaderboard-score">ชนะ ${wins} เซต</span></div>`;
-                        });
-                        listContainer.innerHTML = listHtml;
-                    } else {
-                        listContainer.innerHTML = '<div style="text-align: center; color: #777; font-size: 11px; padding: 5px;">แสดงอันดับท็อป 3 บนโพเดียมครบแล้ว</div>';
-                    }
-                } else {
-                    containerWrapper.innerHTML = imageHtml;
+                    cloudWins = data.wins || {};
+                    cloudLosses = data.losses || {};
+                    cloudHistory = data.history || [];
+                    cloudCourts = data.courts || {};
                 }
-            } catch (e) {
-                console.error("Error fetching cloud: ", e);
-            }
+                for (let name in playerWins) {
+                    if (!cloudWins[name]) cloudWins[name] = playerWins[name];
+                    if (!cloudHistory.includes(name)) cloudHistory.push(name);
+                }
+                let sorted = [...cloudHistory].sort((a, b) => (cloudWins[b] || 0) - (cloudWins[a] || 0));
+                let top1 = sorted[0] ? { name: sorted[0], wins: cloudWins[sorted[0]] || 0, losses: cloudLosses[sorted[0]] || 0 } : null;
+                let top2 = sorted[1] ? { name: sorted[1], wins: cloudWins[sorted[1]] || 0, losses: cloudLosses[sorted[1]] || 0 } : null;
+                let top3 = sorted[2] ? { name: sorted[2], wins: cloudWins[sorted[2]] || 0, losses: cloudLosses[sorted[2]] || 0 } : null;
+
+                if (top1) { let wr = (top1.wins+top1.losses) > 0 ? Math.round((top1.wins/(top1.wins+top1.losses))*100) : 0; imageHtml += `<div class="overlay-card overlay-rank-1"><div class="overlay-name">👑 ${top1.name}</div><div class="overlay-sets">ชนะ ${top1.wins} เซต</div><div class="overlay-winrate">Win Rate ${wr}%</div></div>`; }
+                if (top2) { let wr = (top2.wins+top2.losses) > 0 ? Math.round((top2.wins/(top2.wins+top2.losses))*100) : 0; imageHtml += `<div class="overlay-card overlay-rank-2"><div class="overlay-name">🥈 ${top2.name}</div><div class="overlay-sets">ชนะ ${top2.wins} เซต</div><div class="overlay-winrate">Win Rate ${wr}%</div></div>`; }
+                if (top3) { let wr = (top3.wins+top3.losses) > 0 ? Math.round((top3.wins/(top3.wins+top3.losses))*100) : 0; imageHtml += `<div class="overlay-card overlay-rank-3"><div class="overlay-name">🥉 ${top3.name}</div><div class="overlay-sets">ชนะ ${top3.wins} เซต</div><div class="overlay-winrate">Win Rate ${wr}%</div></div>`; }
+                containerWrapper.innerHTML = imageHtml;
+
+                if (sorted.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align: center; color: #888; font-size: 11px;">ยังไม่มีข้อมูลในระบบคลาวด์</div>';
+                } else {
+                    let listHtml = '';
+                    sorted.forEach((name, idx) => {
+                        let w = cloudWins[name] || 0;
+                        let l = cloudLosses[name] || 0;
+                        let total = w + l;
+                        let wr = total > 0 ? Math.round((w / total) * 100) : 0;
+                        let cName = cloudCourts[name] || 'ยังไม่ได้ระบุสนาม';
+                        listHtml += `
+                            <div class="cloud-row-item">
+                                <div><b>#${idx + 1} ${name}</b><br><span style="font-size:10px; color:#38bdf8;">🏟️ ล่าสุด: ${cName}</span></div>
+                                <div style="color: #34d399; font-weight: 700;">ชนะ ${w} | แพ้ ${l} (${wr}%)</div>
+                            </div>
+                        `;
+                    });
+                    listContainer.innerHTML = listHtml;
+                }
+            } catch (e) { console.error(e); }
         };
 
         window.autoSyncToCloud = async function() {
             try {
                 let docSnap = await getDoc(rankDocRef);
-                let existingWins = {}, existingHistory = [];
+                let existingWins = {}, existingLosses = {}, existingHistory = [], existingCourts = {};
                 if (docSnap.exists()) {
                     let data = docSnap.data();
                     existingWins = data.wins || {};
+                    existingLosses = data.losses || {};
                     existingHistory = data.history || [];
+                    existingCourts = data.courts || {};
                 }
                 for (let name in playerWins) {
                     existingWins[name] = Math.max(existingWins[name] || 0, playerWins[name]);
+                    existingLosses[name] = Math.max(existingLosses[name] || 0, playerLosses[name] || 0);
                     if (!existingHistory.includes(name)) existingHistory.push(name);
+                    if (playerLastCourt[name]) existingCourts[name] = playerLastCourt[name];
                 }
-                await setDoc(rankDocRef, { wins: existingWins, history: existingHistory }, { merge: true });
-            } catch (e) { console.error("Auto sync error: ", e); }
+                await setDoc(rankDocRef, { wins: existingWins, losses: existingLosses, history: existingHistory, courts: existingCourts }, { merge: true });
+            } catch (e) { console.error(e); }
         };
 
         window.resetCloudLeaderboardSecure = async function() {
-            let pin = prompt("กรุณาใส่รหัสผ่านแอดมิน (PIN 4 ตัว) เพื่อรีเซ็ตคลาวด์กลาง:");
+            let pin = prompt("รหัสแอดมิน (PIN 4 ตัว):");
             if (pin === ADMIN_PIN) {
-                if (confirm('ยืนยันการล้างสถิติตารางแชมป์โลกทั้งหมดบนคลาวด์กลางหรือไม่?')) {
-                    try {
-                        await setDoc(rankDocRef, { wins: {}, history: [] });
-                        fetchCloudLeaderboard();
-                        alert('🗑️ ล้างสถิติคลาวด์กลางเรียบร้อย!');
-                    } catch (e) { alert('❌ ไม่สามารถรีเซ็ตได้'); }
-                }
-            } else if (pin !== null) { alert("❌ รหัสผ่านไม่ถูกต้อง!"); }
+                await setDoc(rankDocRef, { wins: {}, losses: {}, history: [], courts: {} });
+                fetchCloudLeaderboard();
+                alert('🗑️ รีเซ็ตคลาวด์สำเร็จ!');
+            } else if (pin !== null) { alert('❌ รหัสผิด'); }
         };
     </script>
 
